@@ -151,6 +151,6 @@ Each step is built alone, tested alone, then added to the whole. After steps 3, 
 ## 8. Still to do
 
 - Receive the Sarvam API key and confirm which Saaras version and Tamil quality we get.
-- Receive the official Tamil document(s) and check every scheme fact against official sources. Until then the data is marked *not yet verified*. A first source (a news explainer) differs from our earlier notes on the age limit and an asset limit, so this must be settled.
+- The official Tamil Nadu social security page (Tamil text) is saved in `docs/sources/`. It gives eligibility, amounts and the online route for the state and central pension schemes, and it overrides the earlier news-based notes (for example, the Destitute Widow Pension is age 18+ at Rs.1,200 a month, with immovable property up to Rs.1,00,000). It does not list required documents or define "destitute", so those still need an official source. Other schemes (health insurance, women's rights grant, farmer and health schemes) still need their own sources. Until each fact is checked against a government order, the data stays marked *not yet verified*.
 - Confirm Sarvam's embeddings access for our account (optional).
 - Check whether the competition requires showing Wispr Flow in the demo video.
