@@ -34,7 +34,7 @@ Frontend:
 
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
@@ -43,6 +43,6 @@ Open the URL that Vite prints. It forwards `/api` requests to the backend on por
 ## Tests
 
 ```bash
-cd backend && .venv/bin/pytest
-cd frontend && npm run build   # type check and build
+(cd backend && .venv/bin/pytest)
+(cd frontend && npm run build)   # type check and build
 ```
