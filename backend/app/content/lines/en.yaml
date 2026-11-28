@@ -1,0 +1,383 @@
+# Screen text and questions. English and Tamil must have the same keys, question ids and option values (tested).
+ui:
+  tagline: Your Voice. Your Rights. Your Benefits.
+  intro: Answer a few questions to see which benefits may apply to you.
+  memory_note: Your answers are not saved. They are lost if you reload this page.
+  voice_not_ready: Voice is not working yet. Please tap your answers.
+  start: Start
+  back: Back
+  next: Next
+  dont_know: I don't know
+  enter_number: Enter a number
+  number_invalid: Please enter a number from {min} to {max}.
+  question_of: Question {n} of {total}
+  confirm_title: Check your answers
+  confirm_help: Change anything that is wrong. Nothing is checked until you confirm.
+  edit: Change
+  see_results: These are correct. Show results
+  checking: Checking…
+  error_check: We could not check your answers. They are still here.
+  try_again: Try again
+  results_title: Your results
+  no_guarantee: This does not guarantee eligibility or approval. Government officials decide.
+  outcome_potentially_eligible: May be eligible
+  outcome_needs_more_information: Needs more information
+  outcome_appears_ineligible: Appears not eligible
+  not_reviewed: Not yet reviewed by a person. We cannot show a match for this yet.
+  amounts: What it could give
+  amounts_note: Do not add amounts together. You may not get more than one.
+  reasons: Why
+  status_met: 'Yes'
+  status_not_met: 'No'
+  status_unknown: Not known
+  status_needs_check: Needs checking
+  checks: Still to be checked
+  conflicts: Other government pages say different things
+  sources: Sources
+  source_date: Dated
+  date_unknown: date not shown
+  checked_on: Collected on
+  apply: Where to apply
+  your_district: Your district
+  service_code: Service code
+  charge: Listed service charge
+  not_confirmed: Not confirmed. Ask the office.
+  documents_button: See the documents
+  documents_title: Documents
+  document_of: Document {n} of {total}
+  have: I have it
+  dont_have: I don't have it
+  how_to_get: How to get it
+  still_need: You still need
+  have_all: You said you have everything on this list.
+  back_to_results: Back to results
+  start_again: Start again
+questions:
+- id: lives_in_tn
+  type: choice
+  text: Do you live in Tamil Nadu?
+  options:
+  - value: 'yes'
+    label: 'Yes'
+  - value: 'no'
+    label: 'No'
+  - value: unknown
+    label: I don't know
+  show_if: null
+  min: null
+  max: null
+- id: district
+  type: select
+  text: Which district do you live in?
+  options:
+  - value: ariyalur
+    label: Ariyalur
+  - value: chengalpattu
+    label: Chengalpattu
+  - value: chennai
+    label: Chennai
+  - value: coimbatore
+    label: Coimbatore
+  - value: cuddalore
+    label: Cuddalore
+  - value: dharmapuri
+    label: Dharmapuri
+  - value: dindigul
+    label: Dindigul
+  - value: erode
+    label: Erode
+  - value: kallakurichi
+    label: Kallakurichi
+  - value: kancheepuram
+    label: Kancheepuram
+  - value: kanniyakumari
+    label: Kanniyakumari
+  - value: karur
+    label: Karur
+  - value: krishnagiri
+    label: Krishnagiri
+  - value: madurai
+    label: Madurai
+  - value: mayiladuthurai
+    label: Mayiladuthurai
+  - value: nagapattinam
+    label: Nagapattinam
+  - value: namakkal
+    label: Namakkal
+  - value: nilgiris
+    label: Nilgiris
+  - value: perambalur
+    label: Perambalur
+  - value: pudukkottai
+    label: Pudukkottai
+  - value: ramanathapuram
+    label: Ramanathapuram
+  - value: ranipet
+    label: Ranipet
+  - value: salem
+    label: Salem
+  - value: sivaganga
+    label: Sivaganga
+  - value: tenkasi
+    label: Tenkasi
+  - value: thanjavur
+    label: Thanjavur
+  - value: theni
+    label: Theni
+  - value: thoothukudi
+    label: Thoothukudi
+  - value: tiruchirappalli
+    label: Tiruchirappalli
+  - value: tirunelveli
+    label: Tirunelveli
+  - value: tirupathur
+    label: Tirupathur
+  - value: tiruppur
+    label: Tiruppur
+  - value: tiruvallur
+    label: Tiruvallur
+  - value: tiruvannamalai
+    label: Tiruvannamalai
+  - value: tiruvarur
+    label: Tiruvarur
+  - value: vellore
+    label: Vellore
+  - value: viluppuram
+    label: Viluppuram
+  - value: virudhunagar
+    label: Virudhunagar
+  - value: unknown
+    label: I don't know
+  show_if:
+    lives_in_tn:
+    - 'yes'
+    - unknown
+  min: null
+  max: null
+- id: area
+  type: choice
+  text: Do you live in a village, or in a town or city?
+  options:
+  - value: village
+    label: Village
+  - value: town_city
+    label: Town or city
+  - value: unknown
+    label: I don't know
+  show_if:
+    lives_in_tn:
+    - 'yes'
+    - unknown
+  min: null
+  max: null
+- id: age
+  type: number
+  text: How old are you?
+  options: null
+  show_if: null
+  min: 0
+  max: 120
+- id: widowed
+  type: choice
+  text: Has your husband passed away?
+  options:
+  - value: 'yes'
+    label: 'Yes'
+  - value: 'no'
+    label: 'No'
+  - value: unknown
+    label: I don't know
+  show_if: null
+  min: null
+  max: null
+- id: husband_death_when
+  type: choice
+  text: When did he pass away?
+  options:
+  - value: within_1_year
+    label: Within the last year
+  - value: 1_to_2_years
+    label: One to two years ago
+  - value: over_2_years
+    label: More than two years ago
+  - value: unknown
+    label: I don't know
+  show_if:
+    widowed:
+    - 'yes'
+  min: null
+  max: null
+- id: husband_age_at_death
+  type: number
+  text: How old was he when he passed away?
+  options: null
+  show_if:
+    widowed:
+    - 'yes'
+  min: 0
+  max: 120
+- id: death_cause
+  type: choice
+  text: Was it a natural death or an accident?
+  options:
+  - value: natural
+    label: Natural death or illness
+  - value: accident
+    label: Accident
+  - value: unknown
+    label: I don't know
+  show_if:
+    widowed:
+    - 'yes'
+  min: null
+  max: null
+- id: death_at_work
+  type: choice
+  text: Did the accident happen while he was working?
+  options:
+  - value: 'yes'
+    label: 'Yes'
+  - value: 'no'
+    label: 'No'
+  - value: unknown
+    label: I don't know
+  show_if:
+    death_cause:
+    - accident
+  min: null
+  max: null
+- id: husband_main_earner
+  type: choice
+  text: Was he the main earner in your family?
+  options:
+  - value: 'yes'
+    label: 'Yes'
+  - value: 'no'
+    label: 'No'
+  - value: unknown
+    label: I don't know
+  show_if:
+    widowed:
+    - 'yes'
+  min: null
+  max: null
+- id: husband_work
+  type: choice
+  text: What work did he do?
+  options:
+  - value: construction
+    label: Construction work
+  - value: driver
+    label: Driver or vehicle work
+  - value: other_manual
+    label: Other manual work
+  - value: farm_labour
+    label: Farm labour
+  - value: farming
+    label: Own farming
+  - value: salaried
+    label: Salaried job
+  - value: government
+    label: Government job
+  - value: other
+    label: Something else
+  - value: unknown
+    label: I don't know
+  show_if:
+    widowed:
+    - 'yes'
+  min: null
+  max: null
+- id: husband_board_registered
+  type: choice
+  text: Was he registered with a workers' welfare board?
+  options:
+  - value: 'yes'
+    label: 'Yes'
+  - value: 'no'
+    label: 'No'
+  - value: unknown
+    label: I don't know
+  show_if:
+    husband_work:
+    - construction
+    - driver
+    - other_manual
+    - farm_labour
+    - other
+    - unknown
+  min: null
+  max: null
+- id: insurance_deduction
+  type: choice
+  text: In his bank passbook, did you see a yearly insurance deduction? Do not tell us the account number.
+  options:
+  - value: life
+    label: ₹436, or ₹330 in earlier years (life insurance)
+  - value: accident
+    label: ₹20, or ₹12 in earlier years (accident insurance)
+  - value: both
+    label: Both
+  - value: none
+    label: I checked and did not see these amounts
+  - value: unknown
+    label: I don't know
+  show_if:
+    widowed:
+    - 'yes'
+  min: null
+  max: null
+- id: own_income
+  type: choice
+  text: Do you have a regular income of your own?
+  options:
+  - value: none
+    label: No regular income
+  - value: some
+    label: Yes, some
+  - value: unknown
+    label: I don't know
+  show_if: null
+  min: null
+  max: null
+- id: property_value
+  type: choice
+  text: About how much is your house or land worth?
+  options:
+  - value: under_50000
+    label: Under ₹50,000, or none
+  - value: 50000_to_100000
+    label: ₹50,000 to ₹1,00,000
+  - value: over_100000
+    label: More than ₹1,00,000
+  - value: unknown
+    label: I don't know
+  show_if: null
+  min: null
+  max: null
+- id: adult_relative_at_home
+  type: choice
+  text: Does a son, grandson or other relative aged 18 or older live with you?
+  options:
+  - value: 'yes'
+    label: 'Yes'
+  - value: 'no'
+    label: 'No'
+  - value: unknown
+    label: I don't know
+  show_if: null
+  min: null
+  max: null
+- id: bpl_card
+  type: choice
+  text: Does your household have a below-poverty-line card or number?
+  options:
+  - value: 'yes'
+    label: 'Yes'
+  - value: 'no'
+    label: 'No'
+  - value: unknown
+    label: I don't know
+  show_if: null
+  min: null
+  max: null

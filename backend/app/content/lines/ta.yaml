@@ -1,0 +1,383 @@
+# Screen text and questions. English and Tamil must have the same keys, question ids and option values (tested).
+ui:
+  tagline: உங்கள் குரல். உங்கள் உரிமை. உங்கள் நலன்.
+  intro: உங்களுக்கு எந்த உதவிகள் பொருந்தலாம் என்று அறிய சில கேள்விகளுக்குப் பதில் அளியுங்கள்.
+  memory_note: உங்கள் பதில்கள் சேமிக்கப்படாது. பக்கத்தை மீண்டும் ஏற்றினால் அவை அழிந்துவிடும்.
+  voice_not_ready: குரல் வசதி இன்னும் வேலை செய்யவில்லை. தொட்டுப் பதில் அளியுங்கள்.
+  start: தொடங்கு
+  back: பின்செல்
+  next: அடுத்து
+  dont_know: எனக்குத் தெரியாது
+  enter_number: எண்ணை உள்ளிடுங்கள்
+  number_invalid: '{min} முதல் {max} வரை ஓர் எண்ணை உள்ளிடுங்கள்.'
+  question_of: கேள்வி {n} / {total}
+  confirm_title: உங்கள் பதில்களைச் சரிபார்க்கவும்
+  confirm_help: தவறு இருந்தால் மாற்றுங்கள். நீங்கள் உறுதி செய்யும் வரை எதுவும் சரிபார்க்கப்படாது.
+  edit: மாற்று
+  see_results: இவை சரி. முடிவுகளைக் காட்டு
+  checking: சரிபார்க்கிறது…
+  error_check: உங்கள் பதில்களைச் சரிபார்க்க முடியவில்லை. அவை இன்னும் இங்கே உள்ளன.
+  try_again: மீண்டும் முயற்சிக்கவும்
+  results_title: உங்கள் முடிவுகள்
+  no_guarantee: இது தகுதிக்கோ ஒப்புதலுக்கோ உத்தரவாதம் அல்ல. அரசு அதிகாரிகளே முடிவு செய்வார்கள்.
+  outcome_potentially_eligible: தகுதி இருக்கலாம்
+  outcome_needs_more_information: மேலும் தகவல் தேவை
+  outcome_appears_ineligible: தகுதி இல்லை எனத் தெரிகிறது
+  not_reviewed: இந்த விதியை இன்னும் ஒருவர் சரிபார்க்கவில்லை. இதற்கான பொருத்தத்தை இப்போது காட்ட முடியாது.
+  amounts: கிடைக்கக்கூடியது
+  amounts_note: தொகைகளைக் கூட்ட வேண்டாம். ஒன்றுக்கு மேல் கிடைக்காமல் போகலாம்.
+  reasons: காரணம்
+  status_met: ஆம்
+  status_not_met: இல்லை
+  status_unknown: தெரியவில்லை
+  status_needs_check: சரிபார்க்க வேண்டும்
+  checks: இன்னும் சரிபார்க்க வேண்டியவை
+  conflicts: வேறு அரசுப் பக்கங்கள் மாறுபட்டுக் கூறுகின்றன
+  sources: ஆதாரங்கள்
+  source_date: ஆவணத் தேதி
+  date_unknown: தேதி குறிப்பிடப்படவில்லை
+  checked_on: சேகரித்த தேதி
+  apply: எங்கே விண்ணப்பிப்பது
+  your_district: உங்கள் மாவட்டம்
+  service_code: சேவைக் குறியீடு
+  charge: பட்டியலில் உள்ள சேவைக் கட்டணம்
+  not_confirmed: உறுதிப்படுத்தப்படவில்லை. அலுவலகத்தில் கேளுங்கள்.
+  documents_button: ஆவணங்களைப் பார்
+  documents_title: ஆவணங்கள்
+  document_of: ஆவணம் {n} / {total}
+  have: என்னிடம் உள்ளது
+  dont_have: என்னிடம் இல்லை
+  how_to_get: எப்படிப் பெறுவது
+  still_need: இன்னும் தேவையானவை
+  have_all: இப்பட்டியலில் உள்ள அனைத்தும் உங்களிடம் உள்ளதாகக் கூறினீர்கள்.
+  back_to_results: முடிவுகளுக்குத் திரும்பு
+  start_again: மீண்டும் தொடங்கு
+questions:
+- id: lives_in_tn
+  type: choice
+  text: நீங்கள் தமிழ்நாட்டில் வசிக்கிறீர்களா?
+  options:
+  - value: 'yes'
+    label: ஆம்
+  - value: 'no'
+    label: இல்லை
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if: null
+  min: null
+  max: null
+- id: district
+  type: select
+  text: நீங்கள் எந்த மாவட்டத்தில் வசிக்கிறீர்கள்?
+  options:
+  - value: ariyalur
+    label: அரியலூர்
+  - value: chengalpattu
+    label: செங்கல்பட்டு
+  - value: chennai
+    label: சென்னை
+  - value: coimbatore
+    label: கோயம்புத்தூர்
+  - value: cuddalore
+    label: கடலூர்
+  - value: dharmapuri
+    label: தருமபுரி
+  - value: dindigul
+    label: திண்டுக்கல்
+  - value: erode
+    label: ஈரோடு
+  - value: kallakurichi
+    label: கள்ளக்குறிச்சி
+  - value: kancheepuram
+    label: காஞ்சிபுரம்
+  - value: kanniyakumari
+    label: கன்னியாகுமரி
+  - value: karur
+    label: கரூர்
+  - value: krishnagiri
+    label: கிருஷ்ணகிரி
+  - value: madurai
+    label: மதுரை
+  - value: mayiladuthurai
+    label: மயிலாடுதுறை
+  - value: nagapattinam
+    label: நாகப்பட்டினம்
+  - value: namakkal
+    label: நாமக்கல்
+  - value: nilgiris
+    label: நீலகிரி
+  - value: perambalur
+    label: பெரம்பலூர்
+  - value: pudukkottai
+    label: புதுக்கோட்டை
+  - value: ramanathapuram
+    label: ராமநாதபுரம்
+  - value: ranipet
+    label: ராணிப்பேட்டை
+  - value: salem
+    label: சேலம்
+  - value: sivaganga
+    label: சிவகங்கை
+  - value: tenkasi
+    label: தென்காசி
+  - value: thanjavur
+    label: தஞ்சாவூர்
+  - value: theni
+    label: தேனி
+  - value: thoothukudi
+    label: தூத்துக்குடி
+  - value: tiruchirappalli
+    label: திருச்சிராப்பள்ளி
+  - value: tirunelveli
+    label: திருநெல்வேலி
+  - value: tirupathur
+    label: திருப்பத்தூர்
+  - value: tiruppur
+    label: திருப்பூர்
+  - value: tiruvallur
+    label: திருவள்ளூர்
+  - value: tiruvannamalai
+    label: திருவண்ணாமலை
+  - value: tiruvarur
+    label: திருவாரூர்
+  - value: vellore
+    label: வேலூர்
+  - value: viluppuram
+    label: விழுப்புரம்
+  - value: virudhunagar
+    label: விருதுநகர்
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if:
+    lives_in_tn:
+    - 'yes'
+    - unknown
+  min: null
+  max: null
+- id: area
+  type: choice
+  text: நீங்கள் கிராமத்தில் வசிக்கிறீர்களா, அல்லது நகரத்தில் வசிக்கிறீர்களா?
+  options:
+  - value: village
+    label: கிராமம்
+  - value: town_city
+    label: நகரம் / மாநகரம்
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if:
+    lives_in_tn:
+    - 'yes'
+    - unknown
+  min: null
+  max: null
+- id: age
+  type: number
+  text: உங்களுக்கு எத்தனை வயது?
+  options: null
+  show_if: null
+  min: 0
+  max: 120
+- id: widowed
+  type: choice
+  text: உங்கள் கணவர் காலமானாரா?
+  options:
+  - value: 'yes'
+    label: ஆம்
+  - value: 'no'
+    label: இல்லை
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if: null
+  min: null
+  max: null
+- id: husband_death_when
+  type: choice
+  text: அவர் எப்போது காலமானார்?
+  options:
+  - value: within_1_year
+    label: கடந்த ஓராண்டுக்குள்
+  - value: 1_to_2_years
+    label: ஒன்று முதல் இரண்டு ஆண்டுகளுக்கு முன்
+  - value: over_2_years
+    label: இரண்டு ஆண்டுகளுக்கு மேல்
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if:
+    widowed:
+    - 'yes'
+  min: null
+  max: null
+- id: husband_age_at_death
+  type: number
+  text: அவர் காலமானபோது அவருக்கு எத்தனை வயது?
+  options: null
+  show_if:
+    widowed:
+    - 'yes'
+  min: 0
+  max: 120
+- id: death_cause
+  type: choice
+  text: அது இயற்கை மரணமா அல்லது விபத்தா?
+  options:
+  - value: natural
+    label: இயற்கை மரணம் / நோய்
+  - value: accident
+    label: விபத்து
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if:
+    widowed:
+    - 'yes'
+  min: null
+  max: null
+- id: death_at_work
+  type: choice
+  text: அவர் வேலை செய்யும்போது அந்த விபத்து நடந்ததா?
+  options:
+  - value: 'yes'
+    label: ஆம்
+  - value: 'no'
+    label: இல்லை
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if:
+    death_cause:
+    - accident
+  min: null
+  max: null
+- id: husband_main_earner
+  type: choice
+  text: உங்கள் குடும்பத்தில் முக்கிய வருமானம் ஈட்டியவர் அவரா?
+  options:
+  - value: 'yes'
+    label: ஆம்
+  - value: 'no'
+    label: இல்லை
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if:
+    widowed:
+    - 'yes'
+  min: null
+  max: null
+- id: husband_work
+  type: choice
+  text: அவர் என்ன வேலை செய்தார்?
+  options:
+  - value: construction
+    label: கட்டுமான வேலை
+  - value: driver
+    label: ஓட்டுநர் / வாகனத் தொழில்
+  - value: other_manual
+    label: பிற உடலுழைப்பு வேலை
+  - value: farm_labour
+    label: விவசாயக் கூலி வேலை
+  - value: farming
+    label: சொந்த விவசாயம்
+  - value: salaried
+    label: மாதச் சம்பள வேலை
+  - value: government
+    label: அரசு வேலை
+  - value: other
+    label: வேறு வேலை
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if:
+    widowed:
+    - 'yes'
+  min: null
+  max: null
+- id: husband_board_registered
+  type: choice
+  text: அவர் தொழிலாளர் நலவாரியத்தில் பதிவு செய்திருந்தாரா?
+  options:
+  - value: 'yes'
+    label: ஆம்
+  - value: 'no'
+    label: இல்லை
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if:
+    husband_work:
+    - construction
+    - driver
+    - other_manual
+    - farm_labour
+    - other
+    - unknown
+  min: null
+  max: null
+- id: insurance_deduction
+  type: choice
+  text: அவரது வங்கிக் கணக்குப் புத்தகத்தில் ஆண்டுக் காப்பீட்டுத் தொகை பிடித்தம் இருந்ததா? கணக்கு எண்ணைச் சொல்ல வேண்டாம்.
+  options:
+  - value: life
+    label: ₹436, முந்தைய ஆண்டுகளில் ₹330 (ஆயுள் காப்பீடு)
+  - value: accident
+    label: ₹20, முந்தைய ஆண்டுகளில் ₹12 (விபத்துக் காப்பீடு)
+  - value: both
+    label: இரண்டும்
+  - value: none
+    label: 'பார்த்தேன்: இந்தத் தொகைகள் இல்லை'
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if:
+    widowed:
+    - 'yes'
+  min: null
+  max: null
+- id: own_income
+  type: choice
+  text: உங்களுக்கென்று வழக்கமான வருமானம் உள்ளதா?
+  options:
+  - value: none
+    label: வழக்கமான வருமானம் இல்லை
+  - value: some
+    label: ஆம், உள்ளது
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if: null
+  min: null
+  max: null
+- id: property_value
+  type: choice
+  text: உங்கள் வீடு அல்லது நிலத்தின் மதிப்பு ஏறத்தாழ எவ்வளவு?
+  options:
+  - value: under_50000
+    label: ₹50,000க்குக் கீழ், அல்லது சொத்து இல்லை
+  - value: 50000_to_100000
+    label: ₹50,000 முதல் ₹1,00,000
+  - value: over_100000
+    label: ₹1,00,000க்கு மேல்
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if: null
+  min: null
+  max: null
+- id: adult_relative_at_home
+  type: choice
+  text: 18 வயது அல்லது அதற்கு மேற்பட்ட மகன், பேரன் அல்லது வேறு உறவினர் உங்களுடன் வசிக்கிறாரா?
+  options:
+  - value: 'yes'
+    label: ஆம்
+  - value: 'no'
+    label: இல்லை
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if: null
+  min: null
+  max: null
+- id: bpl_card
+  type: choice
+  text: உங்கள் குடும்பத்திற்கு வறுமைக் கோட்டிற்குக் கீழ் அட்டை அல்லது எண் உள்ளதா?
+  options:
+  - value: 'yes'
+    label: ஆம்
+  - value: 'no'
+    label: இல்லை
+  - value: unknown
+    label: எனக்குத் தெரியாது
+  show_if: null
+  min: null
+  max: null

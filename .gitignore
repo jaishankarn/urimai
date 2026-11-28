@@ -161,3 +161,7 @@ __pycache__/
 *.pyc
 .venv/
 .pytest_cache/
+
+# Collected documents stay local: they can contain names and office contacts
+data/raw/
+data/knowledge/

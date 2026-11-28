@@ -1,0 +1,162 @@
+# Reviewer: compare conditions, amounts and checks with each source's quote and link.
+# When satisfied, set review to {by: your initials, on: date, checksum: output of
+#   cd backend && .venv/bin/python -m scripts.review_checksum national-widow-pension }
+# Any later change to conditions, checks or amounts makes the rule unreviewed again.
+id: national-widow-pension
+name:
+  en: Indira Gandhi National Widow Pension
+  ta: இந்திரா காந்தி தேசிய விதவை ஓய்வூதியம்
+aliases:
+- தேசிய விதவை ஓய்வூதியம்
+- IGNWPS
+- national widow pension
+- desiya vithavai pension
+conditions:
+- id: lives_in_tn
+  text:
+    en: You live in Tamil Nadu
+    ta: நீங்கள் தமிழ்நாட்டில் வசிக்கிறீர்கள்
+  kind: checkable
+  any_of:
+  - - fact: lives_in_tn
+      op: eq
+      value: 'yes'
+  source: charter
+- id: widowed
+  text:
+    en: You are a widow
+    ta: நீங்கள் கணவரை இழந்தவர்
+  kind: checkable
+  any_of:
+  - - fact: widowed
+      op: eq
+      value: 'yes'
+  source: charter
+- id: age
+  text:
+    en: You are 40 or older
+    ta: உங்கள் வயது 40 அல்லது அதற்கு மேல்
+  kind: checkable
+  any_of:
+  - - fact: age
+      op: min
+      value: 40
+  source: charter
+- id: bpl
+  text:
+    en: Your household is below the poverty line
+    ta: உங்கள் குடும்பம் வறுமைக் கோட்டிற்குக் கீழ் உள்ளது
+  kind: checkable
+  any_of:
+  - - fact: bpl_card
+      op: eq
+      value: 'yes'
+  source: charter
+checks:
+- id: destitute
+  text:
+    en: Officials still need to confirm that you count as destitute. We found no official definition.
+    ta: நீங்கள் ஆதரவற்றவர் என்பதை அதிகாரிகள் உறுதிப்படுத்த வேண்டும். இதற்கான அதிகாரப்பூர்வ வரையறை எங்களுக்குக் கிடைக்கவில்லை.
+  source: charter
+- id: bpl_listing
+  text:
+    en: The office must confirm your below-poverty-line listing.
+    ta: வறுமைக் கோட்டிற்குக் கீழ் உள்ள பட்டியலில் இருப்பதை அலுவலகம் உறுதிப்படுத்த வேண்டும்.
+  source: null
+- id: age_80
+  text:
+    en: If you are 80 or older, ask how the pension is paid. The central share is different.
+    ta: 80 வயதுக்கு மேல் இருந்தால் ஓய்வூதியம் எப்படி வழங்கப்படும் என்று கேளுங்கள். மத்திய அரசின் பங்கு வேறுபடும்.
+  source: null
+conflicts:
+- id: nsap_ages
+  text:
+    en: The national document gives ages 40 to 79 for the ₹300 central share, and a ₹500 central share from age 80.
+    ta: 'தேசிய ஆவணம்: 40 முதல் 79 வயது வரை மத்தியப் பங்கு ₹300; 80 வயது முதல் ₹500.'
+  source: nsap
+- id: chennai_below_60
+  text:
+    en: A Chennai district page (2021) says applicants must be below 60.
+    ta: 'சென்னை மாவட்டப் பக்கம் (2021): 60 வயதுக்குக் கீழ் இருக்க வேண்டும்.'
+  source: chennai
+- id: pudukkottai_conditions
+  text:
+    en: A Pudukkottai district page adds property below ₹50,000 and no son or similar adult relative living with her. It shows
+      ₹1,000 a month.
+    ta: 'புதுக்கோட்டை மாவட்டப் பக்கம்: சொத்து ₹50,000க்குள்; வயது வந்த மகன் போன்ற உறவினர் உடன் வசிக்கக் கூடாது. மாதம் ₹1,000
+      என்று காட்டுகிறது.'
+  source: pudukkottai
+amounts:
+- text:
+    en: ₹1,200 a month in total
+    ta: மொத்தம் மாதம் ₹1,200
+  source: charter
+  when: []
+documents:
+  confirmed: true
+  note: null
+  items:
+  - id: ration_or_aadhaar
+    text:
+      en: Copy of ration card or Aadhaar card
+      ta: ரேஷன் அட்டை அல்லது ஆதார் அட்டை நகல்
+    how: null
+  - id: age_proof
+    text:
+      en: Proof of age
+      ta: வயதுச் சான்று
+    how: null
+  - id: husband_death_certificate
+    text:
+      en: Husband's death certificate
+      ta: கணவரின் இறப்புச் சான்றிதழ்
+    how: null
+apply:
+  text:
+    en: Send the application to the Special Tahsildar (Social Security Scheme), the Special Deputy Collector (Social Security
+      Scheme) or the District Collector.
+    ta: விண்ணப்பத்தை தனி வட்டாட்சியர் (சமூகப் பாதுகாப்புத் திட்டம்), தனி துணை ஆட்சியர் (சமூகப் பாதுகாப்புத் திட்டம்) அல்லது
+      மாவட்ட ஆட்சியருக்கு அனுப்புங்கள்.
+  service_code: null
+  charge_rupees: null
+  source: charter
+sources:
+- id: charter
+  title: Social Welfare and Women Empowerment citizen charter 2024-25
+  url: https://cms.tn.gov.in/cms_migrated/document/docfiles/swwe_e_cc_2024_25.pdf
+  type: state department publication
+  source_date: 2024-25
+  checked_on: '2026-11-28'
+  local_file: official/social-welfare-and-women-empowerment-citizen-charter-2024-25-c2e3371c.md
+  quote: (IGNWPS) 2 Objective of the Scheme To disburse pension to the Widow of age between 40 years and above and belonging
+    to household below the poverty line. 3 Assistance provided Rs.1,200/- per month. 4 Eligible persons ➢ Destitute. ➢ Belonging
+    to below poverty line. ➢ 40 years and above. ➢ Should be a Widow.
+- id: nsap
+  title: National Social Assistance Programme (PIB, November 2025)
+  url: https://static.pib.gov.in/WriteReadData/specificdocs/documents/2025/nov/doc2025117686801.pdf
+  type: national government publication
+  source_date: 2025-11
+  checked_on: '2026-11-28'
+  local_file: official/pib-document-nsap-2025-7ae459f2.md
+  quote: financial assistance is extended to widows aged between 40 and 79years who belong to families living below the poverty
+    line
+- id: chennai
+  title: 'Chennai district: pension eligibility'
+  url: https://chennai.nic.in/oap-eligibility/
+  type: district government page
+  source_date: '2021-10-02'
+  checked_on: '2026-11-28'
+  local_file: districts/oap-eligibility-adb7ea2f.md
+  quote: PENSION SCHEME (IGNWPS) | · Destitute · Widow · Age should be 40 and above. And age should be below 60
+- id: pudukkottai
+  title: 'Pudukkottai district: social security schemes'
+  url: https://pudukkottai.nic.in/social-security-schemes/
+  type: district government page
+  source_date: '2026-05-11'
+  checked_on: '2026-11-28'
+  local_file: districts/social-security-schemes-3864f581.md
+  quote: Indira Gandhi National Widow Pension | 1000 | Should be a widow 40 years and above Destitute Belonging to below poverty
+    line family Without any income or source of income owning fixed assets valuing less than Rs.50000/- who have no relative
+    of 18 years of age and over of the following category son, son’s son and other related persons who normally live together
+review: null
+government_order_verified: false

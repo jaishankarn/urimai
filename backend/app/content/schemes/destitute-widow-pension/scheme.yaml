@@ -1,0 +1,191 @@
+# Reviewer: compare conditions, amounts and checks with each source's quote and link.
+# When satisfied, set review to {by: your initials, on: date, checksum: output of
+#   cd backend && .venv/bin/python -m scripts.review_checksum destitute-widow-pension }
+# Any later change to conditions, checks or amounts makes the rule unreviewed again.
+id: destitute-widow-pension
+name:
+  en: Destitute Widow Pension
+  ta: ஆதரவற்ற விதவை ஓய்வூதியம்
+aliases:
+- விதவை உதவித்தொகை
+- விதவை ஓய்வூதியம்
+- ஆதரவற்ற விதவை
+- vithavai pension
+- widow pension
+- destitute widow
+conditions:
+- id: lives_in_tn
+  text:
+    en: You live in Tamil Nadu
+    ta: நீங்கள் தமிழ்நாட்டில் வசிக்கிறீர்கள்
+  kind: checkable
+  any_of:
+  - - fact: lives_in_tn
+      op: eq
+      value: 'yes'
+  source: charter
+- id: widowed
+  text:
+    en: You are a widow
+    ta: நீங்கள் கணவரை இழந்தவர்
+  kind: checkable
+  any_of:
+  - - fact: widowed
+      op: eq
+      value: 'yes'
+  source: charter
+- id: age
+  text:
+    en: You are 18 or older
+    ta: உங்கள் வயது 18 அல்லது அதற்கு மேல்
+  kind: checkable
+  any_of:
+  - - fact: age
+      op: min
+      value: 18
+  source: charter
+- id: property
+  text:
+    en: Your property is worth ₹1,00,000 or less
+    ta: உங்கள் சொத்து மதிப்பு ₹1,00,000 அல்லது அதற்குக் குறைவு
+  kind: checkable
+  any_of:
+  - - fact: property_value
+      op: in
+      value:
+      - under_50000
+      - 50000_to_100000
+  source: charter
+checks:
+- id: destitute
+  text:
+    en: Officials still need to confirm that you count as destitute. We found no official definition.
+    ta: நீங்கள் ஆதரவற்றவர் என்பதை அதிகாரிகள் உறுதிப்படுத்த வேண்டும். இதற்கான அதிகாரப்பூர்வ வரையறை எங்களுக்குக் கிடைக்கவில்லை.
+  source: charter
+- id: income_relatives
+  text:
+    en: Tell the office about your income and any adult relatives who live with you.
+    ta: உங்கள் வருமானம் மற்றும் உங்களுடன் வசிக்கும் வயது வந்த உறவினர்கள் பற்றி அலுவலகத்தில் தெரிவியுங்கள்.
+  source: null
+conflicts:
+- id: chennai_age_property
+  text:
+    en: A Chennai district page (2021) says applicants must be below 40, with property up to ₹50,000.
+    ta: 'சென்னை மாவட்டப் பக்கம் (2021): 40 வயதுக்குக் கீழ் இருக்க வேண்டும்; சொத்து ₹50,000 வரை.'
+  source: chennai
+- id: pudukkottai_conditions
+  text:
+    en: A Pudukkottai district page says property below ₹50,000, eligibility only up to her son turning 18, and no son or
+      similar relative aged 18 or over living with her. It also shows ₹1,000 a month.
+    ta: 'புதுக்கோட்டை மாவட்டப் பக்கம்: சொத்து ₹50,000க்குள்; மகனுக்கு 18 வயது ஆகும் வரை மட்டும்; 18 வயது அல்லது அதற்கு மேற்பட்ட
+      மகன் போன்ற உறவினர் உடன் வசிக்கக் கூடாது. மாதம் ₹1,000 என்றும் காட்டுகிறது.'
+  source: pudukkottai
+amounts:
+- text:
+    en: ₹1,200 a month
+    ta: மாதம் ₹1,200
+  source: charter
+  when: []
+documents:
+  confirmed: true
+  note:
+    en: 'This is the e-Sevai list. The 2024-25 citizen charter lists only three: ration or Aadhaar card copy, proof of age
+      and husband''s death certificate.'
+    ta: 'இது இ-சேவைப் பட்டியல். 2024-25 குடிமக்கள் சாசனத்தில் மூன்று மட்டுமே உள்ளன: ரேஷன் அல்லது ஆதார் அட்டை நகல், வயதுச்
+      சான்று, கணவரின் இறப்புச் சான்றிதழ்.'
+  items:
+  - id: photo
+    text:
+      en: Applicant photo
+      ta: விண்ணப்பதாரரின் புகைப்படம்
+    how: null
+  - id: aadhaar
+    text:
+      en: Aadhaar card
+      ta: ஆதார் அட்டை
+    how: null
+  - id: aadhaar_consent
+    text:
+      en: Aadhaar consent form
+      ta: ஆதார் ஒப்புதல் படிவம்
+    how: null
+  - id: address
+    text:
+      en: Smart or ration card, or any address proof
+      ta: ஸ்மார்ட்/ரேஷன் அட்டை அல்லது ஏதேனும் முகவரிச் சான்று
+    how: null
+  - id: husband_death_certificate
+    text:
+      en: Husband's death certificate
+      ta: கணவரின் இறப்புச் சான்றிதழ்
+    how: null
+  - id: self_declaration
+    text:
+      en: Self-declaration
+      ta: சுய உறுதிமொழி
+    how: null
+  - id: widow_certificate
+    text:
+      en: Widow certificate
+      ta: விதவைச் சான்றிதழ்
+    how:
+      en: 'Apply for the ''Widow Certificate'' at e-Sevai. Service charge listed: ₹60.'
+      ta: 'இ-சேவையில் ''விதவைச் சான்றிதழ்'' பெற விண்ணப்பியுங்கள். பட்டியலில் உள்ள சேவைக் கட்டணம்: ₹60.'
+  - id: identity
+    text:
+      en: Any identity proof (voter ID, passport, PAN or driving licence)
+      ta: ஏதேனும் அடையாளச் சான்று (வாக்காளர் அட்டை, கடவுச்சீட்டு, பான் அல்லது ஓட்டுநர் உரிமம்)
+    how: null
+  - id: passbook
+    text:
+      en: Bank passbook
+      ta: வங்கிக் கணக்குப் புத்தகம்
+    how: null
+apply:
+  text:
+    en: Apply through e-Sevai.
+    ta: இ-சேவை மூலம் விண்ணப்பியுங்கள்.
+  service_code: REV-202
+  charge_rupees: 10
+  source: esevai
+sources:
+- id: charter
+  title: Social Welfare and Women Empowerment citizen charter 2024-25
+  url: https://cms.tn.gov.in/cms_migrated/document/docfiles/swwe_e_cc_2024_25.pdf
+  type: state department publication
+  source_date: 2024-25
+  checked_on: '2026-11-28'
+  local_file: official/social-welfare-and-women-empowerment-citizen-charter-2024-25-c2e3371c.md
+  quote: Assistance provided Rs.1,200/- per month. 4 Eligible persons ➢ Destitute ➢ 18 years and above. ➢ Should be a widow.
+    ➢ Should not possess property valuing more than Rs.1,00,000/-
+- id: esevai
+  title: e-Sevai service list
+  url: https://www.tnesevai.tn.gov.in/Pages/ServiceList.aspx
+  type: e-Sevai service list
+  source_date: null
+  checked_on: '2026-11-28'
+  local_file: official/e-sevai-service-list-6f5ff859.md
+  quote: Destitute Widow Pension Scheme (DWPS) | Operator | - | 0 | 10 | 1. Applicant Photo 2. Aadhaar Card 3. Aadhaar Consent
+    Form 4. Smart or Ration Card or Any Address Proof 5. Husband Death Certificate 6. Self-declaration of Applicant 7. Widow
+    Certificate 8. Any Identity Proof(Voter ID Card,Passport,PAN Card,Driving License) 9. Bank Passbook
+- id: chennai
+  title: 'Chennai district: pension eligibility'
+  url: https://chennai.nic.in/oap-eligibility/
+  type: district government page
+  source_date: '2021-10-02'
+  checked_on: '2026-11-28'
+  local_file: districts/oap-eligibility-adb7ea2f.md
+  quote: 'DESTITUTE WIDOW PENSION SCHEME (DWPS) | Destitute · Widow · Age should be 18 and above . And age should be below
+    40. If applicant age 60 and above 60 apply in old age pension · Fixed Assets(land/house): Not exceeds Rs. 50,000'
+- id: pudukkottai
+  title: 'Pudukkottai district: social security schemes'
+  url: https://pudukkottai.nic.in/social-security-schemes/
+  type: district government page
+  source_date: '2026-05-11'
+  checked_on: '2026-11-28'
+  local_file: districts/social-security-schemes-3864f581.md
+  quote: Destitute Widow Pension Scheme | 1000 | Destitute 18 years and above Should be widow (up to her son attaining the
+    age of 18 years) Without any income or source of income owning fixed assets valuing less than Rs.50000/- who have no relative
+    of 18 years of age and over of the following category son, son’s son and other related persons who normally live together
+review: null
+government_order_verified: false
