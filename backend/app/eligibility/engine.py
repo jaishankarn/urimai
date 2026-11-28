@@ -6,7 +6,8 @@ from app.contracts.scheme import Apply, Clause, Documents, PublicSource, Scheme,
 NOT_CONFIRMED = Text(en="Not confirmed. Ask the office.", ta="உறுதிப்படுத்தப்படவில்லை. அலுவலகத்தில் கேளுங்கள்.")
 
 
-def _clause(clause: Clause, facts: Facts) -> str:
+def clause_status(clause: Clause, facts: Facts) -> str:
+    """"met", "not_met" or "unknown"."""
     value = getattr(facts, clause.fact)
     if value is None or value == "unknown" or value in clause.unknown_values:
         return "unknown"
@@ -33,7 +34,7 @@ def _evaluate_one(scheme: Scheme, facts: Facts) -> Result:
     conditions = []
     for c in scheme.conditions:
         status = "needs_check" if c.kind == "disputed" else _any(
-            [_all([_clause(clause, facts) for clause in group]) for group in c.any_of])
+            [_all([clause_status(clause, facts) for clause in group]) for group in c.any_of])
         conditions.append(ConditionResult(id=c.id, text=c.text, status=status, source=c.source))
 
     statuses = {c.status for c in conditions}
@@ -50,7 +51,7 @@ def _evaluate_one(scheme: Scheme, facts: Facts) -> Result:
         scheme_id=scheme.id, name=scheme.name, outcome=outcome, reviewed=scheme.reviewed,
         # An unreviewed rule names the scheme and its open questions only: an amount, a way to apply or a
         # document list would read as a checked match.
-        amounts=[a.text for a in scheme.amounts if _all([_clause(w, facts) for w in a.when]) != "not_met"] if scheme.reviewed else [],
+        amounts=[a.text for a in scheme.amounts if _all([clause_status(w, facts) for w in a.when]) != "not_met"] if scheme.reviewed else [],
         conditions=conditions, checks=scheme.checks, conflicts=scheme.conflicts,
         documents=scheme.documents if scheme.reviewed else Documents(confirmed=False, note=NOT_CONFIRMED),
         apply=scheme.apply if scheme.reviewed else Apply(text=NOT_CONFIRMED),
