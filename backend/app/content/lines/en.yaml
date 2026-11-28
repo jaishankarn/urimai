@@ -43,6 +43,10 @@ ui:
   charge: Listed service charge
   not_confirmed: Not confirmed. Ask the office.
   documents_button: See the documents
+  fill_button: Fill the application with Urimai
+  fill_note: Urimai fills the form by voice and you confirm each detail. You type Aadhaar and captcha, upload documents and press Submit yourself.
+  fill_demo_note: This opens our practice portal (demo). Nothing is sent to any government department.
+  fill_error: We could not open the application. Please try again.
   documents_title: Documents
   document_of: Document {n} of {total}
   have: I have it

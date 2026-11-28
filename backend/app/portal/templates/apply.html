@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Destitute Widow Pension – Applicant details{% endblock %}
+{% macro err(name) %}{% if errors.get(name) %}<span class="err">{{ errors[name] }}</span>{% endif %}{% endmacro %}
+{% block body %}
+<h2>Destitute Widow Pension – Application (Step 1 of 2: Applicant details)</h2>
+{% if errors %}
+<div class="summary" role="alert">
+  <strong>Please correct the following:</strong>
+  <ul>{% for message in errors.values() %}<li>{{ message }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+<form id="form1" method="post" action="/portal/pension/apply" autocomplete="off">
+<input type="hidden" name="__EVENTTARGET" id="__EVENTTARGET" value="">
+<input type="hidden" name="DoorNo" id="hdnDoorNo" value="{{ v.get('DoorNo', '') }}">
+<input type="hidden" name="Street" id="hdnStreet" value="{{ v.get('Street', '') }}">
+<input type="hidden" name="Pincode" id="hdnPincode" value="{{ v.get('Pincode', '') }}">
+<table class="form">
+  <tr>
+    <td class="lbl">Applicant Name (in English capitals) <span class="req">*</span></td>
+    <td><input type="text" id="ApplicantName" name="ApplicantName" maxlength="60" value="{{ v.get('ApplicantName', '') }}">{{ err('ApplicantName') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl"><label for="ApplicantNameTamil">Applicant Name (in Tamil)</label> <span class="req">*</span></td>
+    <td><input type="text" id="ApplicantNameTamil" name="ApplicantNameTamil" maxlength="60" value="{{ v.get('ApplicantNameTamil', '') }}">{{ err('ApplicantNameTamil') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Late Husband's Name <span class="req">*</span></td>
+    <td><input type="text" id="HusbandName" name="HusbandName" maxlength="60" placeholder="Husband's name in capitals" value="{{ v.get('HusbandName', '') }}">{{ err('HusbandName') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Gender <span class="req">*</span></td>
+    <td>
+      {% for g in genders %}<label class="radio"><input type="radio" name="Gender" value="{{ g }}" {% if v.get('Gender') == g %}checked{% endif %}> {{ g }}</label>{% endfor %}
+      {{ err('Gender') }}
+    </td>
+  </tr>
+  <tr>
+    <td class="lbl">Date of Birth <span class="req">*</span></td>
+    <td><input type="text" id="DateOfBirth" name="DateOfBirth" readonly placeholder="dd/mm/yyyy" value="{{ v.get('DateOfBirth', '') }}">{{ err('DateOfBirth') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Age</td>
+    <td><input type="text" id="Age" name="Age" readonly class="short" value="{{ v.get('Age', '') }}"> <span class="hint">(calculated from date of birth)</span>{{ err('Age') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Marital Status <span class="req">*</span></td>
+    <td><select id="MaritalStatus" name="MaritalStatus">
+      <option value="">-- Select --</option>
+      {% for m in marital %}<option value="{{ m }}" {% if v.get('MaritalStatus') == m %}selected{% endif %}>{{ m }}</option>{% endfor %}
+    </select>{{ err('MaritalStatus') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Community <span class="req">*</span></td>
+    <td><select id="Community" name="Community" class="wide">
+      <option value="">-- Select --</option>
+      {% for code, text in communities.items() %}<option value="{{ code }}" {% if v.get('Community') == code %}selected{% endif %}>{{ text }}</option>{% endfor %}
+    </select>{{ err('Community') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Mobile Number <span class="req">*</span></td>
+    <td><input type="text" id="MobileNo" name="MobileNo" maxlength="10" inputmode="numeric" value="{{ v.get('MobileNo', '') }}"><span class="err js-err" id="MobileNoErr"></span>{{ err('MobileNo') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Aadhaar Number <span class="req">*</span></td>
+    <td><input type="text" id="AadhaarNo" name="AadhaarNo" maxlength="12" inputmode="numeric" value="{{ v.get('AadhaarNo', '') }}">{{ err('AadhaarNo') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">District <span class="req">*</span></td>
+    <td><select id="District" name="District" onchange="__doPostBack('District')">
+      <option value="">-- Select --</option>
+      {% for slug, name in districts.items() %}<option value="{{ slug }}" {% if v.get('District') == slug %}selected{% endif %}>{{ name }}</option>{% endfor %}
+    </select>{{ err('District') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Taluk <span class="req">*</span></td>
+    <td><select id="Taluk" name="Taluk" onchange="__doPostBack('Taluk')">
+      <option value="">-- Select --</option>
+      {% for t in taluks %}<option value="{{ t }}" {% if v.get('Taluk') == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+    </select>{{ err('Taluk') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Village / Ward <span class="req">*</span></td>
+    <td><select id="Village" name="Village" onchange="__doPostBack('Village')">
+      <option value="">-- Select --</option>
+      {% for w in villages %}<option value="{{ w }}" {% if v.get('Village') == w %}selected{% endif %}>{{ w }}</option>{% endfor %}
+    </select>{{ err('Village') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Address</td>
+    <td>
+      <iframe id="AddressFrame" src="/portal/pension/address-frame" title="Address" class="addr-frame"></iframe>
+      {{ err('DoorNo') }}{{ err('Street') }}{{ err('Pincode') }}
+    </td>
+  </tr>
+</table>
+<div class="actions"><button type="submit" id="btnSaveNext" name="save_next" value="1" class="btn">Save &amp; Next</button></div>
+</form>
+{% endblock %}
+{% block scripts %}<script src="/portal/static/apply.js"></script>{% endblock %}

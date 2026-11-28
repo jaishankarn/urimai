@@ -23,9 +23,25 @@ services:
     environment:
       SARVAM_API_KEY: ${SARVAM_API_KEY:-}
       DATABASE_URL: postgresql://urimai:${POSTGRES_PASSWORD:-urimai_local}@db:5432/urimai
+      # Testing only: AI_PROVIDER=local sends the widget's AI step to the local-ai service instead of Sarvam.
+      AI_PROVIDER: ${AI_PROVIDER:-}
+      LOCAL_AI_URL: ${LOCAL_AI_URL:-http://local-ai:8080/v1}
     depends_on:
       db:
         condition: service_healthy
 
+  # Optional small local model for testing, so test runs do not spend Sarvam credits. Not started by default:
+  #   AI_PROVIDER=local docker compose --profile local-ai up --build
+  # The first start downloads the model (about 1.1 GB) into the local-ai-models volume.
+  local-ai:
+    profiles: ["local-ai"]
+    image: ghcr.io/ggml-org/llama.cpp:server
+    command: ["-hf", "Qwen/Qwen2.5-1.5B-Instruct-GGUF:Q4_K_M", "--host", "0.0.0.0", "--port", "8080", "-c", "4096"]
+    volumes:
+      - local-ai-models:/root/.cache
+    ports:
+      - "8080:8080"
+
 volumes:
   pgdata:
+  local-ai-models:

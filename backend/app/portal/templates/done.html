@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Acknowledgement{% endblock %}
+{% block body %}
+<h2>Acknowledgement</h2>
+<div class="ack">
+  <p>Your application for <strong>Destitute Widow Pension</strong> has been received (demo).</p>
+  <p>Acknowledgement No: <strong id="AckNo">{{ ref }}</strong></p>
+  {% if applicant %}<p>Applicant: {{ applicant }}</p>{% endif %}
+  <p class="note">This is a practice portal. Nothing was sent to any government department.</p>
+</div>
+<p><a class="btn" href="/portal/">Home</a></p>
+{% endblock %}

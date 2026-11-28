@@ -1,4 +1,5 @@
 import type { Content, Lang, Outcome, Result } from '../api'
+import FillButton from './FillButton'
 import { card, link, secondary, title } from './ui'
 
 const GROUPS: { outcome: Outcome; style: string }[] = [
@@ -7,9 +8,16 @@ const GROUPS: { outcome: Outcome; style: string }[] = [
   { outcome: 'appears_ineligible', style: 'border-stone-400 bg-stone-200 text-stone-900' },
 ]
 
-type CardProps = { ui: Content['ui']; lang: Lang; result: Result; district: string; onDocuments: () => void }
+type CardProps = {
+  ui: Content['ui']
+  lang: Lang
+  result: Result
+  district: string
+  facts: Record<string, string | number>
+  onDocuments: () => void
+}
 
-function Card({ ui, lang, result, district, onDocuments }: CardProps) {
+function Card({ ui, lang, result, district, facts, onDocuments }: CardProps) {
   const ineligible = result.outcome === 'appears_ineligible'
   // Amounts, how to apply and documents appear only for a reviewed rule that has not been ruled out.
   const actionable = result.reviewed && !ineligible
@@ -114,6 +122,8 @@ function Card({ ui, lang, result, district, onDocuments }: CardProps) {
           {ui.documents_button}
         </button>
       )}
+
+      {!ineligible && <FillButton ui={ui} lang={lang} schemeId={result.scheme_id} facts={facts} />}
     </article>
   )
 }
@@ -123,12 +133,13 @@ type Props = {
   lang: Lang
   results: Result[]
   district: string
+  facts: Record<string, string | number>
   onDocuments: (schemeId: string) => void
   onBack: () => void
   onRestart: () => void
 }
 
-export default function Results({ ui, lang, results, district, onDocuments, onBack, onRestart }: Props) {
+export default function Results({ ui, lang, results, district, facts, onDocuments, onBack, onRestart }: Props) {
   return (
     <div className="flex w-full flex-col gap-4">
       <button type="button" className={`${link} self-start`} onClick={onBack}>
@@ -152,6 +163,7 @@ export default function Results({ ui, lang, results, district, onDocuments, onBa
                 lang={lang}
                 result={result}
                 district={district}
+                facts={facts}
                 onDocuments={() => onDocuments(result.scheme_id)}
               />
             ))}

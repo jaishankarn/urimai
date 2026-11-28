@@ -6,6 +6,39 @@ This plan covers everything needed to build the **Urimai voice form widget**, th
 
 ---
 
+## 0. Implementation status (28 Nov 2026)
+
+Steps 1–6 are built; step 7 (voice) is built against the Sarvam API as documented on 28 Nov and is **not yet tried with a real key**.
+
+| Check | Status |
+|---|---|
+| Backend tests (form maps, handoff, sessions, origins, quotas, understanding rules, Sarvam adapter with a mock, portal) | pass |
+| Widget unit tests (labels, locating, frames, sensitive detector, filling, site-error detection) | pass |
+| End-to-end, 6 scenarios (`widget/tests/e2e/run.mjs`): portal in English by tapping and typing (desktop and phone), portal in Tamil by voice (Chromium's fake microphone and a stand-in for Sarvam), portal with no handoff, the website's results button opening the portal, and a site whose checks the widget does not know | pass; each also checks that the widget sent no form, clicked no button and never sent an Aadhaar number |
+| `docker compose up --build` | not run here (Docker Hub rate limit in the build sandbox) |
+| Sarvam with a real key (28 Nov): chat, transliteration, Tamil speech out, and that speech heard back (spoken Tamil numbers come back as digits) | pass, each call 0.5–2.7 s. A real person's voice through the browser microphone is still to try |
+| Local test model (`AI_PROVIDER=local`, Qwen2.5 1.5B) | runs; much weaker (read "ஐம்பத்தெட்டு" as 18), so confirmation read-backs matter |
+
+**No validation of our own.** Reply understanding converts what was said into what to type (number words to digits, a spoken date to a date, a spoken choice to the list's option, a Tamil name to English letters when a box needs them). It never rejects a value for length, format or range; the website does that, and the widget passes the website's message on. The one exception is a box's own `maxlength`, which the browser does not enforce when a value is set by a script, so the widget reads it from the page and says so.
+
+**Site checks are not known in advance.** A form map lists fields, never a site's validation rules. After filling a value, and while waiting for the person to press a button, the widget watches for whatever the site says: a message beside the field (common class names, or `aria-invalid` with `aria-describedby`), the browser's own checks (`pattern`, `type`, `min`/`max`, and the `invalid` event when the browser refuses to send), `alert()` pop-ups, and error summaries or alert boxes, including ones that appear late from a timer or the site's server. Then:
+- a message beside a field the widget filled: it reads the message out and asks for that value again;
+- a message beside a box the form map does not know: it highlights the box and asks the person to fix it themselves;
+- a message for the whole page that names no field: it reads it out and asks which detail to change (or "I will fix it myself");
+- required boxes the form map does not know: before a Next or Submit button, the person is asked to fill them.
+
+**Where the build differs from this plan**
+- Reply understanding (yes/no/done/commands, spoken digits, dates, option matching) lives in one place, the backend (`backend/app/understand/rules.py`), and works without a key. The widget keeps only a tiny offline fallback for yes/no/done.
+- Form map additions: `page` (the page a field is on), `reloads` (choosing reloads the page), `frame` (selector of the same-site frame), `aliases` (spoken words for an option, any language), `finish_page`, and the source `field.<key>` (English-letters name derived from the confirmed Tamil name).
+- `GET /api/demo/handoff?form_id=…&lang=…` opens a demo form with the made-up sample widow's answers, for demos without going through the journey.
+- The website shows "Fill the application with Urimai" for any result that is not "appears not eligible", even for unreviewed rules (none is reviewed yet), with a line saying the practice portal sends nothing to any department. **Decide before the demo** whether that is acceptable.
+- Saying the same value again at "is this right?" counts as yes. A correction given with "no" ("no, it is 98…") is used directly.
+- The panel moves to the other side when it covers the highlighted field, and adds scroll room at the end of the page.
+- End-to-end tests are a Node script using the pre-installed Playwright (`widget/tests/e2e/run.mjs`), not `@playwright/test`. A test site with unknown checks (`widget/tests/e2e/fixture_site.py`) stands in for the CPGRAMS-style fixture; the React fixture is not built yet.
+- "Ration card number" is not treated as a payment card by the sensitive-field detector.
+
+---
+
 ## 1. Goal and success criteria
 
 **Demo story.** The widow from the main journey sees "may be eligible" for the Destitute Widow Pension and taps **"Fill the application with Urimai"**. The practice portal opens in a new tab. The widget greets her by name and fills every field it is allowed to fill, by voice or by tapping, confirming each one. She types her Aadhaar number and the captcha, uploads her documents, ticks the declaration and presses Submit. The portal shows a demo acknowledgement.

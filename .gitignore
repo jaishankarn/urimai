@@ -165,3 +165,7 @@ __pycache__/
 # Collected documents stay local: they can contain names and office contacts
 data/raw/
 data/knowledge/
+
+# Built files the backend serves in local development
+backend/static/
+backend/widget_dist/

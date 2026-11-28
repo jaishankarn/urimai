@@ -1,0 +1,203 @@
+# Form map for the practice portal's pension form (/portal/). Data only: the widget has no code for this site.
+# The real e-Sevai REV-202 field list is not public; this portal is modelled on common patterns.
+# Fields are done in this order on each page: fill/check first, then the user's own steps, then the button.
+id: demo-destitute-widow-pension
+scheme_id: destitute-widow-pension
+service_code: REV-202
+demo: true
+title:
+  en: Destitute Widow Pension application (practice portal)
+  ta: ஆதரவற்ற விதவை ஓய்வூதிய விண்ணப்பம் (பயிற்சித் தளம்)
+site:
+  key: urimai-practice
+  origins: [self]
+  start_url: /portal/pension/apply
+  pages: [/portal/pension/apply, /portal/pension/documents, /portal/pension/done]
+finish_page: /portal/pension/done
+fingerprint:
+  labels: [applicant name, date of birth, district]
+  min_match: 2
+fields:
+# ---- Page 1: applicant ----
+- key: name_ta
+  page: /portal/pension/apply
+  find: { selector: "#ApplicantNameTamil", labels: ["applicant name (in tamil"] }
+  mode: fill
+  kind: name_native
+  source: ask
+  label: { en: Your name in Tamil, ta: உங்கள் பெயர் (தமிழில்) }
+  ask: { en: "What is your full name? Say it the way it is written on your ration card.", ta: "உங்கள் முழுப் பெயர் என்ன? ரேஷன் அட்டையில் உள்ளபடி சொல்லுங்கள்." }
+- key: name_en
+  page: /portal/pension/apply
+  find: { selector: "#ApplicantName", labels: ["applicant name (in english"] }
+  mode: fill
+  kind: name_latin
+  format: upper
+  source: field.name_ta
+  label: { en: Your name in English capital letters, ta: உங்கள் பெயர் (ஆங்கிலப் பெரிய எழுத்துகளில்) }
+  ask: { en: "How is your name spelt in English letters? You can spell it letter by letter.", ta: "உங்கள் பெயரை ஆங்கில எழுத்துகளில் எப்படி எழுதுவது? எழுத்து எழுத்தாகச் சொல்லலாம்." }
+  help: { en: "This form needs your name in English capital letters, as on your Aadhaar or bank passbook.", ta: "இந்தப் படிவத்தில் உங்கள் பெயர் ஆங்கிலப் பெரிய எழுத்துகளில் வேண்டும், ஆதார் அல்லது வங்கிப் புத்தகத்தில் உள்ளபடி." }
+- key: husband_name
+  page: /portal/pension/apply
+  find: { selector: "#HusbandName", labels: ["husband's name", "late husband"] }
+  mode: fill
+  kind: text
+  format: upper
+  source: ask
+  label: { en: Your late husband's name, ta: மறைந்த கணவரின் பெயர் }
+  ask: { en: "What was your husband's name, in English letters?", ta: "உங்கள் கணவரின் பெயர் என்ன? ஆங்கில எழுத்துகளில் சொல்லுங்கள்." }
+- key: gender
+  page: /portal/pension/apply
+  find: { labels: [gender] }
+  mode: fill
+  kind: choice
+  source: ask
+  aliases:
+    Female: [பெண், pen, penn, woman, lady]
+    Male: [ஆண், aan, man]
+    Transgender: [திருநங்கை, thirunangai]
+  label: { en: Gender, ta: பாலினம் }
+  ask: { en: "Gender: female, male or transgender?", ta: "பாலினம்: பெண், ஆண், அல்லது திருநங்கை?" }
+- key: dob
+  page: /portal/pension/apply
+  find: { selector: "#DateOfBirth", labels: [date of birth] }
+  mode: fill
+  kind: date
+  format: dd/mm/yyyy
+  source: ask
+  label: { en: Date of birth, ta: பிறந்த தேதி }
+  ask: { en: "What is your date of birth? For example, 14 March 1968.", ta: "உங்கள் பிறந்த தேதி என்ன? உதாரணமாக, 14 மார்ச் 1968." }
+  help: { en: "If you do not know the exact date, use the date on your Aadhaar or ration card.", ta: "சரியான தேதி தெரியாவிட்டால், ஆதார் அல்லது ரேஷன் அட்டையில் உள்ள தேதியைச் சொல்லுங்கள்." }
+- key: age
+  page: /portal/pension/apply
+  find: { selector: "#Age", labels: [age] }
+  mode: check
+  kind: digits
+  source: facts.age
+  label: { en: Age, ta: வயது }
+- key: marital
+  page: /portal/pension/apply
+  find: { selector: "#MaritalStatus", labels: [marital status] }
+  mode: fill
+  kind: choice
+  source: facts.widowed
+  map: { "yes": Widow }
+  aliases:
+    Widow: [விதவை, கணவரை இழந்தவர், vidhavai, vithavai]
+    Married: [திருமணமானவர், married]
+    Unmarried: [திருமணமாகாதவர், single]
+    Divorced: [விவாகரத்து]
+  label: { en: Marital status, ta: திருமண நிலை }
+  ask: { en: "What is your marital status?", ta: "உங்கள் திருமண நிலை என்ன?" }
+- key: community
+  page: /portal/pension/apply
+  find: { selector: "#Community", labels: [community] }
+  mode: fill
+  kind: choice
+  source: ask
+  aliases:
+    BC: [backward class, பிற்படுத்தப்பட்டோர், பி சி]
+    MBC: [most backward class, மிகவும் பிற்படுத்தப்பட்டோர், எம் பி சி]
+    SC: [scheduled caste, ஆதிதிராவிடர், எஸ் சி]
+    ST: [scheduled tribe, பழங்குடியினர், எஸ் டி]
+    OC: [other, general, forward, பொதுப் பிரிவு, ஓ சி]
+  label: { en: Community, ta: சமூகப் பிரிவு }
+  ask: { en: "Which community are you: BC, MBC, SC, ST or OC? It is on your community certificate.", ta: "உங்கள் சமூகப் பிரிவு என்ன: பி.சி, எம்.பி.சி, எஸ்.சி, எஸ்.டி அல்லது ஓ.சி? சாதிச் சான்றிதழில் இருக்கும்." }
+- key: mobile
+  page: /portal/pension/apply
+  find: { selector: "#MobileNo", labels: [mobile number] }
+  mode: fill
+  kind: mobile
+  source: ask
+  label: { en: Mobile number, ta: கைபேசி எண் }
+  ask: { en: "What is your 10-digit mobile number? Messages about this application will come to it.", ta: "உங்கள் 10 இலக்க கைபேசி எண் என்ன? இந்த விண்ணப்பம் பற்றிய செய்திகள் அதற்கு வரும்." }
+- key: district
+  page: /portal/pension/apply
+  find: { selector: "#District", labels: [district] }
+  mode: fill
+  kind: choice
+  source: facts.district
+  reloads: true
+  label: { en: District, ta: மாவட்டம் }
+  ask: { en: "Which district do you live in?", ta: "நீங்கள் எந்த மாவட்டத்தில் வசிக்கிறீர்கள்?" }
+- key: taluk
+  page: /portal/pension/apply
+  find: { selector: "#Taluk", labels: [taluk] }
+  mode: fill
+  kind: choice
+  source: ask
+  reloads: true
+  label: { en: Taluk, ta: வட்டம் }
+  ask: { en: "Which taluk?", ta: "எந்த வட்டம்?" }
+- key: village
+  page: /portal/pension/apply
+  find: { selector: "#Village", labels: [village] }
+  mode: fill
+  kind: choice
+  source: ask
+  reloads: true
+  label: { en: Village or ward, ta: கிராமம் அல்லது வார்டு }
+  ask: { en: "Which village or ward?", ta: "எந்தக் கிராமம் அல்லது வார்டு?" }
+- key: door_no
+  page: /portal/pension/apply
+  frame: "#AddressFrame"
+  find: { selector: "#DoorNo", labels: [door no] }
+  mode: fill
+  kind: text
+  source: ask
+  label: { en: Door number, ta: கதவு எண் }
+  ask: { en: "What is your door number?", ta: "உங்கள் கதவு எண் என்ன?" }
+- key: street
+  page: /portal/pension/apply
+  frame: "#AddressFrame"
+  find: { selector: "#Street", labels: [street] }
+  mode: fill
+  kind: address
+  source: ask
+  label: { en: Street or area, ta: தெரு அல்லது பகுதி }
+  ask: { en: "What is your street or area name?", ta: "உங்கள் தெரு அல்லது பகுதியின் பெயர் என்ன?" }
+- key: pincode
+  page: /portal/pension/apply
+  frame: "#AddressFrame"
+  find: { selector: "#Pincode", labels: [pin code, pincode] }
+  mode: fill
+  kind: pincode
+  source: ask
+  label: { en: PIN code, ta: அஞ்சல் குறியீட்டு எண் }
+  ask: { en: "What is your 6-digit PIN code?", ta: "உங்கள் 6 இலக்க அஞ்சல் குறியீட்டு எண் என்ன?" }
+- key: aadhaar
+  page: /portal/pension/apply
+  find: { selector: "#AadhaarNo", labels: [aadhaar number] }
+  mode: user
+  say: { en: "Please type your Aadhaar number in the highlighted box yourself. I will not see or store it. Say done when finished.", ta: "ஆதார் எண்ணை ஒளிரும் பெட்டியில் நீங்களே தட்டச்சு செய்யுங்கள். நான் அதைப் பார்க்கவோ சேமிக்கவோ மாட்டேன். முடிந்ததும் 'முடிந்தது' என்று சொல்லுங்கள்." }
+- key: save_next
+  page: /portal/pension/apply
+  find: { selector: "#btnSaveNext" }
+  mode: next
+  say: { en: "This page is done. Please check it and press Save & Next yourself.", ta: "இந்தப் பக்கம் முடிந்தது. சரிபார்த்து, “Save & Next” பொத்தானை நீங்களே அழுத்துங்கள்." }
+# ---- Page 2: documents ----
+- key: photo
+  page: /portal/pension/documents
+  find: { selector: "#Photo", labels: [applicant photo] }
+  mode: user
+  say: { en: "Please upload your photo in the highlighted box. Say done when it is attached.", ta: "ஒளிரும் பெட்டியில் உங்கள் புகைப்படத்தைப் பதிவேற்றுங்கள். இணைத்ததும் 'முடிந்தது' என்று சொல்லுங்கள்." }
+- key: death_certificate
+  page: /portal/pension/documents
+  find: { selector: "#DeathCertificate", labels: [death certificate] }
+  mode: user
+  say: { en: "Please upload your husband's death certificate. Say done when it is attached.", ta: "கணவரின் இறப்புச் சான்றிதழைப் பதிவேற்றுங்கள். இணைத்ததும் 'முடிந்தது' என்று சொல்லுங்கள்." }
+- key: declaration
+  page: /portal/pension/documents
+  find: { selector: "#Declaration", labels: [i declare] }
+  mode: user
+  say: { en: "Read the declaration. If it is true, tick the box yourself. Say done when finished.", ta: "உறுதிமொழியைப் படியுங்கள். அது உண்மை என்றால், பெட்டியை நீங்களே டிக் செய்யுங்கள். முடிந்ததும் 'முடிந்தது' என்று சொல்லுங்கள்." }
+- key: captcha
+  page: /portal/pension/documents
+  find: { selector: "#CaptchaText", labels: [captcha] }
+  mode: user
+  say: { en: "Type the letters shown in the picture yourself. Say done when finished.", ta: "படத்தில் உள்ள எழுத்துகளை நீங்களே தட்டச்சு செய்யுங்கள். முடிந்ததும் 'முடிந்தது' என்று சொல்லுங்கள்." }
+- key: submit
+  page: /portal/pension/documents
+  find: { selector: "#btnSubmit" }
+  mode: submit
+  say: { en: "Everything is ready. Check the page, then press Submit yourself. I will never submit for you.", ta: "எல்லாம் தயார். பக்கத்தைச் சரிபார்த்து, “Submit” பொத்தானை நீங்களே அழுத்துங்கள். நான் ஒருபோதும் உங்களுக்காகச் சமர்ப்பிக்க மாட்டேன்." }
