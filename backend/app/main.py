@@ -4,7 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from app.api import eligibility
+from app.api import content, eligibility
 from app.scheme_library.loader import load_schemes
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
@@ -22,6 +22,7 @@ def create_app(static_dir: Path = STATIC_DIR, content_dir: Path = CONTENT_DIR) -
         return {"status": "ok", "sarvam_configured": key not in ("", PLACEHOLDER_KEY)}
 
     app.include_router(eligibility.router(load_schemes(content_dir)))
+    app.include_router(content.router(content_dir))
 
     # Mounted last so /api routes win. Skipped when the frontend isn't built (local dev, tests).
     if static_dir.is_dir():
