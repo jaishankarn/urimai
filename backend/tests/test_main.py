@@ -25,3 +25,13 @@ def test_serves_built_frontend_beside_api(tmp_path):
     assert "<title>Urimai</title>" in client.get("/").text
     assert client.get("/api/health").json()["status"] == "ok"
     assert client.get("/api/unknown").status_code == 404
+
+
+def test_the_page_is_always_checked_for_a_new_version(tmp_path):
+    (tmp_path / "index.html").write_text("<title>Urimai</title>")
+    (tmp_path / "assets").mkdir()
+    (tmp_path / "assets" / "index-abc123.js").write_text("x")
+    client = TestClient(create_app(tmp_path))
+    # Without this a browser may keep showing the previous build after an update.
+    assert client.get("/").headers["cache-control"] == "no-cache"
+    assert "cache-control" not in client.get("/assets/index-abc123.js").headers

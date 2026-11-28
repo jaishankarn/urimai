@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from starlette.concurrency import run_in_threadpool
 
 from app.brain.extract import Understood, extract
+from app.brain.speakable import Speakable
 from app.contracts.content import Content
 from app.voice.sarvam import EXTENSIONS, configured_key, make_client
 
@@ -33,7 +34,7 @@ class Heard(BaseModel):
     question_id: str | None = None
 
 
-def router(lines: dict[str, Content]) -> APIRouter:
+def router(lines: dict[str, Content], speakable: Speakable) -> APIRouter:
     api = APIRouter()
     calls: deque[float] = deque()
     audio_cache: OrderedDict[tuple[str, str], bytes] = OrderedDict()
@@ -78,6 +79,8 @@ def router(lines: dict[str, Content]) -> APIRouter:
     @api.post("/api/voice/tts")
     def text_to_speech(body: Spoken) -> Response:
         sarvam = client()
+        if not speakable.allows(body.lang, body.text):
+            raise HTTPException(403, "only the app's own lines can be spoken")
         key = (body.lang, body.text)
         if key not in audio_cache:  # saved lines repeat, so do not pay for them twice
             audio_cache[key] = paid(lambda: sarvam.speak(body.text, body.lang))

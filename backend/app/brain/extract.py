@@ -47,8 +47,16 @@ class Understood(BaseModel):
     dont_know: bool = False  # for a number question: the person said they do not know
 
 
-def _flat(text: str) -> str:
-    return " ".join(unicodedata.normalize("NFC", text).casefold().split())
+def _words(text: str) -> list[str]:
+    # Split on punctuation and spaces by Unicode category: Tamil vowel signs are marks and must stay in the word.
+    text = unicodedata.normalize("NFC", text).casefold()
+    return "".join(c if unicodedata.category(c)[0] in "LMN" else " " for c in text).split()
+
+
+def _was_said(quote: str, said: str) -> bool:
+    """The quote must appear as whole words: "no" inside "know" is not a "no"."""
+    wanted, heard = _words(quote), _words(said)
+    return bool(wanted) and any(heard[i:i + len(wanted)] == wanted for i in range(len(heard) - len(wanted) + 1))
 
 
 def _prompt(said: str, question: Question | None) -> str:
@@ -69,7 +77,7 @@ def extract(chat: Callable[[str, str], str], said: str, question: Question | Non
         if not isinstance(item, dict):
             continue
         key, value, quote = item.get("key"), item.get("value"), item.get("quote")
-        if not isinstance(key, str) or not isinstance(quote, str) or not quote.strip() or _flat(quote) not in _flat(said):
+        if not isinstance(key, str) or not isinstance(quote, str) or not _was_said(quote, said):
             continue
         if (key != question.id) if question else (key not in STORY_KEYS):
             continue

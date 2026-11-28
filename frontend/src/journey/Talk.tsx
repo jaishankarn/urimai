@@ -11,8 +11,8 @@ type Props = {
   lang: Lang
   answers: Answers
   onAnswers: (answers: Answers) => void
-  /** Nothing more to ask: the person now checks every answer. */
-  onFinished: () => void
+  /** Nothing more to ask: the person now checks every answer. `speech` is said once that screen is shown. */
+  onFinished: (speech: string[]) => void
   onLeave: () => void
 }
 
@@ -31,8 +31,17 @@ export default function Talk({ content, lang, answers, onAnswers, onFinished, on
   const [noted, setNoted] = useState<{ said: string; id: string; value: string } | null>(null)
   // Every move to a new step gets a number, so a late reply from an earlier step is ignored.
   const step = useRef(0)
+  // Questions already passed, so that Back goes to the previous one.
+  const passed = useRef<string[]>([])
 
-  useEffect(() => () => hush(), [])
+  // Leaving the conversation also moves on a step: replies still on their way must not change anything.
+  useEffect(
+    () => () => {
+      step.current++
+      hush()
+    },
+    [],
+  )
 
   const spoken = (id: string, value: string) => {
     const question = questions.find((q) => q.id === id)!
@@ -48,7 +57,8 @@ export default function Talk({ content, lang, answers, onAnswers, onFinished, on
     say(speech, lang)
   }
 
-  async function askNext(known: Answers) {
+  /** `readBack` is said before the next question, so the person hears what was noted. */
+  async function askNext(known: Answers, readBack: string[] = []) {
     onAnswers(known)
     const mine = ++step.current
     setBusy(true)
@@ -57,11 +67,9 @@ export default function Talk({ content, lang, answers, onAnswers, onFinished, on
     try {
       const { question_id } = await nextQuestion(toFacts(visible, known), skipped)
       if (mine !== step.current) return
-      if (question_id === null) {
-        say([ui.say_confirm], lang)
-        return onFinished()
-      }
-      go({ name: 'question', id: question_id }, [questions.find((q) => q.id === question_id)!.text])
+      if (question_id === null) return onFinished([...readBack, ui.say_confirm])
+      if (stage.name === 'question') passed.current.push(stage.id)
+      go({ name: 'question', id: question_id }, [...readBack, questions.find((q) => q.id === question_id)!.text])
     } catch {
       if (mine !== step.current) return
       setBusy(false)
@@ -81,7 +89,7 @@ export default function Talk({ content, lang, answers, onAnswers, onFinished, on
         const lines = Object.entries(facts).map(([id, value]) => spoken(id, String(value)))
         return go(
           { name: 'check', said, found: facts },
-          lines.length ? [ui.say_story_confirm, lines.map((l) => `${l.question} ${l.answer}.`).join(' ')] : [ui.understood_none],
+          lines.length ? [ui.say_story_confirm, ...lines.map((l) => `${l.question} ${l.answer}.`)] : [ui.understood_none],
         )
       }
       const value = questionId in facts ? String(facts[questionId]) : dont_know ? 'unknown' : undefined
@@ -91,7 +99,7 @@ export default function Talk({ content, lang, answers, onAnswers, onFinished, on
         return say([ui.not_caught], lang)
       }
       setNoted({ said, id: questionId, value })
-      askNext({ ...answers, [questionId]: value })
+      askNext({ ...answers, [questionId]: value }, [`${ui.last_answer}: ${spoken(questionId, value).answer}.`])
     } catch {
       if (mine !== step.current) return
       setBusy(false)
@@ -99,8 +107,18 @@ export default function Talk({ content, lang, answers, onAnswers, onFinished, on
     }
   }
 
+  function previousQuestion() {
+    setNoted(null)
+    const previous = passed.current.pop()
+    go(previous ? { name: 'question', id: previous } : { name: 'story' }, previous ? [questions.find((q) => q.id === previous)!.text] : [])
+  }
+
   const back = (
-    <button type="button" className={`${link} self-start`} onClick={onLeave}>
+    <button
+      type="button"
+      className={`${link} self-start`}
+      onClick={stage.name === 'check' ? () => go({ name: 'story' }, []) : onLeave}
+    >
       ← {ui.back}
     </button>
   )
@@ -207,7 +225,7 @@ export default function Talk({ content, lang, answers, onAnswers, onFinished, on
         total={0}
         answer={answers[question.id]}
         onAnswer={answer}
-        onBack={onLeave}
+        onBack={previousQuestion}
       />
       <button type="button" className={link} onClick={() => say([question.text], lang)}>
         {ui.replay}

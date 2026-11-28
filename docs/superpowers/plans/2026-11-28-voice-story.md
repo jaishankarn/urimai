@@ -18,7 +18,9 @@ Approved on 2026-11-28 ("go with A"): AI only turns replies into suggested facts
 - Unclear or failed understanding changes nothing; the question stays with its buttons.
 - Audio and conversation text are not stored or logged by the app.
 - No key: voice routes answer "Sarvam key not set"; tapping works as before.
-- Paid routes have size limits and a shared per-minute limit.
+- Paid routes have size limits and a shared per-minute limit. Text-to-speech says only the app's own lines (saved lines, question read-backs and suggestion text it has written); anything else is refused.
+- A spoken follow-up answer is read back before the next question. Quotes must match whole words.
+- Back goes to the previous question; after a change from the confirm screen, only newly relevant questions are asked.
 
 ## Approaches
 

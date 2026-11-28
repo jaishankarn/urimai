@@ -5,6 +5,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.brain.questions import next_question
+from app.brain.speakable import Speakable
 from app.brain.suggest import Suggestions, suggest
 from app.contracts.content import Content
 from app.contracts.facts import Facts
@@ -24,7 +25,7 @@ class Confirmed(BaseModel):
     lang: Literal["en", "ta"]
 
 
-def router(schemes: list[Scheme], lines: dict[str, Content]) -> APIRouter:
+def router(schemes: list[Scheme], lines: dict[str, Content], speakable: Speakable) -> APIRouter:
     api = APIRouter()
 
     @api.post("/api/conversation/next")
@@ -33,6 +34,8 @@ def router(schemes: list[Scheme], lines: dict[str, Content]) -> APIRouter:
 
     @api.post("/api/conversation/suggest")
     def suggestions(body: Confirmed) -> Suggestions:
-        return suggest(evaluate(schemes, body.facts), lines[body.lang].ui, body.lang)
+        found = suggest(evaluate(schemes, body.facts), lines[body.lang].ui, body.lang)
+        speakable.remember(body.lang, [*found.speech, *(item.detail for item in found.suggestions)])
+        return found
 
     return api

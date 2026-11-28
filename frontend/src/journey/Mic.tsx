@@ -13,11 +13,13 @@ type Props = {
 
 /** Tap to speak, tap to stop. Typing always works too. Give it a new key for each step. */
 export default function Mic({ ui, lang, busy, onSaid }: Props) {
-  const [state, setState] = useState<'idle' | 'recording' | 'hearing'>('idle')
+  const [state, setState] = useState<'idle' | 'starting' | 'recording' | 'hearing'>('idle')
   const [problem, setProblem] = useState('')
   const [typed, setTyped] = useState('')
   const recording = useRef<{ stop: () => void; cancel: () => void } | null>(null)
   const alive = useRef(true)
+  // Set before waiting for the microphone, so a second tap cannot start a second, hidden recording.
+  const starting = useRef(false)
 
   useEffect(() => {
     alive.current = true
@@ -29,10 +31,14 @@ export default function Mic({ ui, lang, busy, onSaid }: Props) {
 
   async function tap() {
     if (state === 'recording') return recording.current?.stop()
+    if (starting.current) return
+    starting.current = true
+    setState('starting')
     hush()
     setProblem('')
     try {
       const started = await record(async (audio) => {
+        if (!alive.current) return // left this step: nothing is sent
         setState('hearing')
         try {
           const text = await transcribe(audio, lang)
@@ -49,7 +55,10 @@ export default function Mic({ ui, lang, busy, onSaid }: Props) {
       recording.current = started
       setState('recording')
     } catch {
+      setState('idle')
       setProblem(ui.mic_blocked)
+    } finally {
+      starting.current = false
     }
   }
 
@@ -61,7 +70,7 @@ export default function Mic({ ui, lang, busy, onSaid }: Props) {
     setTyped('')
   }
 
-  const working = busy || state === 'hearing'
+  const working = busy || state === 'hearing' || state === 'starting'
   const label = state === 'recording' ? ui.mic_stop : working ? ui.thinking : ui.mic_start
 
   return (

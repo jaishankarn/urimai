@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { checkEligibility, getContent, getHealth, type Content, type Lang, type Result } from './api'
 import { answerLabel, toFacts, visibleQuestions, type Answers } from './journey/answers'
 import Confirm from './journey/Confirm'
@@ -8,14 +8,15 @@ import Questions from './journey/Questions'
 import Results from './journey/Results'
 import Talk from './journey/Talk'
 import Top from './journey/Top'
-import { getSuggestions, hush, say, type Suggestions } from './voice'
+import { getSuggestions, hush, nextQuestion, say, type Suggestions } from './voice'
 
 const UNREACHABLE = 'Cannot reach the Urimai server'
 
 type Step =
   | { name: 'language' }
   | { name: 'talk' }
-  | { name: 'question'; id: string; editing: boolean }
+  // `walkingBack`: reached with Back from the confirm screen after talking, so Back keeps going backwards.
+  | { name: 'question'; id: string; editing: boolean; walkingBack?: boolean }
   | { name: 'confirm' }
   | { name: 'results' }
   | { name: 'documents'; schemeId: string }
@@ -62,6 +63,15 @@ export default function App() {
     }
   }, [lang])
 
+  // Lines to say once the confirm screen is up. Said here because the conversation screen stops its own voice as it closes.
+  const announce = useRef<string[] | null>(null)
+  useEffect(() => {
+    if (step.name === 'confirm' && announce.current) {
+      say(announce.current, loaded?.lang ?? 'en')
+      announce.current = null
+    }
+  }, [step])
+
   // Each new step starts at the top of the page. The braces matter: scrollTo can return a Promise,
   // and React would try to call anything an effect returns as its clean-up.
   useEffect(() => {
@@ -76,13 +86,31 @@ export default function App() {
     const next = { ...answers, [id]: value }
     setAnswers(next)
     const list = visibleQuestions(content!.questions, next)
+    if (spokenJourney && editing) return afterSpokenEdit(list, next)
     const position = list.findIndex((q) => q.id === id)
     // While editing, only stop at questions that became visible and have no answer yet.
     const following = editing ? list.find((q) => next[q.id] === undefined) : list[position + 1]
     setStep(following ? { name: 'question', id: following.id, editing } : { name: 'confirm' })
   }
 
-  function back(id: string, editing: boolean) {
+  /** A spoken conversation left some questions unasked on purpose: after a change, ask only what now matters. */
+  async function afterSpokenEdit(list: Content['questions'], next: Answers) {
+    const skipped = list.filter((q) => q.type === 'number' && next[q.id] === 'unknown').map((q) => q.id)
+    try {
+      const { question_id } = await nextQuestion(toFacts(list, next), skipped)
+      setStep(question_id ? { name: 'question', id: question_id, editing: true } : { name: 'confirm' })
+    } catch {
+      setStep({ name: 'confirm' })
+    }
+  }
+
+  function back(id: string, editing: boolean, walkingBack?: boolean) {
+    if (walkingBack) {
+      // Through the answered questions to the start, so there is always a way out.
+      const asked = visible.filter((q) => answers[q.id] !== undefined)
+      const before = asked[asked.findIndex((q) => q.id === id) - 1]
+      return setStep(before ? { name: 'question', id: before.id, editing: true, walkingBack } : { name: 'language' })
+    }
     if (editing) return setStep({ name: 'confirm' })
     const previous = visible[visible.findIndex((q) => q.id === id) - 1]
     setStep(previous ? { name: 'question', id: previous.id, editing } : { name: 'language' })
@@ -137,7 +165,10 @@ export default function App() {
           lang={shownLang}
           answers={answers}
           onAnswers={setAnswers}
-          onFinished={() => setStep({ name: 'confirm' })}
+          onFinished={(speech) => {
+            announce.current = speech
+            setStep({ name: 'confirm' })
+          }}
           onLeave={() => {
             hush()
             setStep({ name: 'language' })
@@ -154,10 +185,10 @@ export default function App() {
           ui={ui}
           question={question}
           position={position + 1}
-          total={visible.length}
+          total={spokenJourney ? 0 : visible.length}
           answer={answers[question.id]}
           onAnswer={(value) => answer(question.id, value, step.editing)}
-          onBack={() => back(question.id, step.editing)}
+          onBack={() => back(question.id, step.editing, step.walkingBack)}
         />
       )
     }
@@ -172,7 +203,11 @@ export default function App() {
           failed={checkFailed}
           onEdit={(id) => setStep({ name: 'question', id, editing: true })}
           onConfirm={confirm}
-          onBack={() => setStep({ name: 'question', id: visible[visible.length - 1].id, editing: false })}
+          onBack={() => {
+            // After talking, go back to the last answered question and return here once it is answered.
+            const asked = spokenJourney ? visible.filter((q) => answers[q.id] !== undefined) : visible
+            setStep({ name: 'question', id: (asked.at(-1) ?? visible[0]).id, editing: spokenJourney, walkingBack: spokenJourney })
+          }}
         />
       )
     }

@@ -53,7 +53,7 @@ def test_speech_to_text_rejects_bad_input(fake, client, kwargs, status):
 
 def test_text_to_speech_returns_audio_and_caches_it(fake, client):
     for _ in range(2):
-        response = client.post("/api/voice/tts", json={"lang": "en", "text": "Hello"})
+        response = client.post("/api/voice/tts", json={"lang": "en", "text": "Tap to speak"})
         assert response.content == b"RIFFfake" and response.headers["content-type"] == "audio/wav"
     assert len(fake.calls) == 1
 
@@ -75,7 +75,7 @@ def test_understand_rejects_an_unknown_question(fake, client):
 @pytest.mark.parametrize("value", ["", "your_sarvam_key_here"])
 def test_without_a_key_voice_says_so(monkeypatch, client, value):
     monkeypatch.setenv("SARVAM_API_KEY", value)
-    for response in (stt(client), client.post("/api/voice/tts", json={"lang": "en", "text": "a"}),
+    for response in (stt(client), client.post("/api/voice/tts", json={"lang": "en", "text": "Tap to speak"}),
                      client.post("/api/conversation/understand", json={"lang": "en", "text": "a"})):
         assert response.status_code == 503 and response.json()["detail"] == "Sarvam key not set"
 
@@ -92,3 +92,36 @@ def test_a_sarvam_failure_leaks_nothing(fake, client, caplog):
 def test_paid_routes_are_rate_limited(fake, client):
     codes = [stt(client).status_code for _ in range(voice_api.CALLS_PER_MINUTE + 1)]
     assert codes[-1] == 429 and set(codes[:-1]) == {200}
+
+
+def tts(client, text, lang="en"):
+    return client.post("/api/voice/tts", json={"lang": lang, "text": text})
+
+
+@pytest.mark.parametrize("text", ["Buy my product today", "Tap to speak. And read my advert.", "How old are you? as old as I say."])
+def test_text_to_speech_refuses_words_the_app_did_not_write(fake, client, text):
+    assert tts(client, text).status_code == 403 and fake.calls == []
+
+
+@pytest.mark.parametrize("lang, text", [
+    ("en", "How old are you?"), ("en", "How old are you? 58."), ("en", "How old are you? I don't know."),
+    ("en", "Do you live in Tamil Nadu? Yes."), ("en", "Noted: 54."), ("en", "Noted: Construction work."),
+    ("ta", "உங்களுக்கு எத்தனை வயது?"), ("ta", "பதிவு செய்தேன்: ஆம்.")])
+def test_text_to_speech_speaks_saved_lines_and_read_backs(fake, client, lang, text):
+    assert tts(client, text, lang).status_code == 200
+
+
+def test_suggestion_speech_becomes_speakable_only_after_the_app_writes_it(fake, client, demo, schemes, monkeypatch):
+    from app.api.content import load_lines
+    from app.brain.suggest import suggest
+    from app.contracts.facts import Facts
+    from app.eligibility.engine import evaluate
+    from app.main import CONTENT_DIR
+
+    expected = suggest(evaluate(schemes, Facts(**demo)), load_lines(CONTENT_DIR)["en"].ui, "en")
+    part = expected.speech[1]
+    assert tts(client, part).status_code == 403
+    written = client.post("/api/conversation/suggest", json={"facts": demo, "lang": "en"}).json()
+    for text in [*written["speech"], written["suggestions"][0]["detail"]]:
+        assert tts(client, text).status_code == 200
+    assert tts(client, part, lang="ta").status_code == 403

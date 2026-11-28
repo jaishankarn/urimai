@@ -69,3 +69,16 @@ def test_the_asked_options_are_given_to_the_model():
         return '{"facts": []}'
     extract(chat, "x", question("property_value", "choice", "under_50000", "unknown"))
     assert "under_50000" in seen["user"] and "property_value" in seen["user"]
+
+
+@pytest.mark.parametrize("said, quote", [("I don't know", "no"), ("yesterday I lost it", "yes"), ("ஆமாம்", "ஆமா"),
+                                         ("I know the officer", "no")])
+def test_a_quote_inside_another_word_does_not_count(said, quote):
+    assert extract(says(("bpl_card", "yes", quote)), said, question("bpl_card", "choice", "yes", "no", "unknown")).facts == {}
+
+
+@pytest.mark.parametrize("said, quote", [("Yes, I have it.", "yes"), ("ஆமாம், அட்டை இருக்கிறது.", "ஆமாம்"),
+                                         ("Tamil Nadu-ல இருக்கேன்", "Tamil Nadu-ல"), ("no card", "No card.")])
+def test_whole_words_still_count_whatever_the_punctuation(said, quote):
+    found = extract(says(("bpl_card", "yes", quote)), said, question("bpl_card", "choice", "yes", "no", "unknown"))
+    assert found.facts == {"bpl_card": "yes"}
