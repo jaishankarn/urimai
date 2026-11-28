@@ -1,0 +1,146 @@
+# Reviewer: compare conditions, amounts and checks with each source's quote and link.
+# When satisfied, set review to {by: your initials, on: date, checksum: output of
+#   cd backend && .venv/bin/python -m scripts.review_checksum national-old-age-pension }
+# Any later change to conditions, checks or amounts makes the rule unreviewed again.
+id: national-old-age-pension
+name:
+  en: Indira Gandhi National Old Age Pension
+  ta: இந்திரா காந்தி தேசிய முதியோர் ஓய்வூதியம்
+aliases:
+- முதியோர் ஓய்வூதியம்
+- முதியோர் உதவித்தொகை
+- old age pension
+- muthiyor pension
+- IGNOAPS
+conditions:
+- id: lives_in_tn
+  text:
+    en: You live in Tamil Nadu
+    ta: நீங்கள் தமிழ்நாட்டில் வசிக்கிறீர்கள்
+  kind: checkable
+  any_of:
+  - - fact: lives_in_tn
+      op: eq
+      value: 'yes'
+  source: charter
+- id: age
+  text:
+    en: You are 60 or older
+    ta: உங்கள் வயது 60 அல்லது அதற்கு மேல்
+  kind: checkable
+  any_of:
+  - - fact: age
+      op: min
+      value: 60
+  source: charter
+- id: bpl
+  text:
+    en: Your household is below the poverty line
+    ta: உங்கள் குடும்பம் வறுமைக் கோட்டிற்குக் கீழ் உள்ளது
+  kind: checkable
+  any_of:
+  - - fact: bpl_card
+      op: eq
+      value: 'yes'
+  source: charter
+checks:
+- id: destitute
+  text:
+    en: Officials still need to confirm that you count as destitute. We found no official definition.
+    ta: நீங்கள் ஆதரவற்றவர் என்பதை அதிகாரிகள் உறுதிப்படுத்த வேண்டும். இதற்கான அதிகாரப்பூர்வ வரையறை எங்களுக்குக் கிடைக்கவில்லை.
+  source: charter
+conflicts:
+- id: pudukkottai_conditions
+  text:
+    en: 'A Pudukkottai district page adds: unable to earn, property below ₹50,000, and no son or similar adult relative living
+      with you. It shows ₹1,000 a month.'
+    ta: 'புதுக்கோட்டை மாவட்டப் பக்கம் கூடுதலாக: உழைத்துச் சம்பாதிக்க இயலாதவர்; சொத்து ₹50,000க்குள்; வயது வந்த மகன் போன்ற
+      உறவினர் உடன் வசிக்கக் கூடாது. மாதம் ₹1,000 என்று காட்டுகிறது.'
+  source: pudukkottai
+amounts:
+- text:
+    en: ₹1,200 a month in total
+    ta: மொத்தம் மாதம் ₹1,200
+  source: charter
+  when: []
+documents:
+  confirmed: true
+  note:
+    en: This is the e-Sevai list. The citizen charter lists only a ration or Aadhaar card copy and proof of age.
+    ta: இது இ-சேவைப் பட்டியல். குடிமக்கள் சாசனத்தில் ரேஷன் அல்லது ஆதார் அட்டை நகலும் வயதுச் சான்றும் மட்டுமே உள்ளன.
+  items:
+  - id: photo
+    text:
+      en: Applicant photo
+      ta: விண்ணப்பதாரரின் புகைப்படம்
+    how: null
+  - id: aadhaar
+    text:
+      en: Aadhaar card
+      ta: ஆதார் அட்டை
+    how: null
+  - id: aadhaar_consent
+    text:
+      en: Aadhaar consent form
+      ta: ஆதார் ஒப்புதல் படிவம்
+    how: null
+  - id: address
+    text:
+      en: Smart or ration card, or any address proof
+      ta: ஸ்மார்ட்/ரேஷன் அட்டை அல்லது ஏதேனும் முகவரிச் சான்று
+    how: null
+  - id: self_declaration
+    text:
+      en: Self-declaration
+      ta: சுய உறுதிமொழி
+    how: null
+  - id: identity
+    text:
+      en: Any identity proof (voter ID, passport, PAN or driving licence)
+      ta: ஏதேனும் அடையாளச் சான்று (வாக்காளர் அட்டை, கடவுச்சீட்டு, பான் அல்லது ஓட்டுநர் உரிமம்)
+    how: null
+  - id: passbook
+    text:
+      en: Bank passbook
+      ta: வங்கிக் கணக்குப் புத்தகம்
+    how: null
+apply:
+  text:
+    en: Apply through e-Sevai.
+    ta: இ-சேவை மூலம் விண்ணப்பியுங்கள்.
+  service_code: REV-201
+  charge_rupees: 10
+  source: esevai
+sources:
+- id: charter
+  title: Social Welfare and Women Empowerment citizen charter 2024-25
+  url: https://cms.tn.gov.in/cms_migrated/document/docfiles/swwe_e_cc_2024_25.pdf
+  type: state department publication
+  source_date: 2024-25
+  checked_on: '2026-11-28'
+  local_file: official/social-welfare-and-women-empowerment-citizen-charter-2024-25-c2e3371c.md
+  quote: (IGNOAPS) 2. Objective of the Scheme To disburse pension to destitute old age persons of 60 years and above belonging
+    to households below the poverty line. 3. Assistance provided Rs.1,200/- per month. 4. Eligible persons ➢ Destitute ➢ Belonging
+    to below poverty line. ➢ 60 years and above.
+- id: esevai
+  title: e-Sevai service list
+  url: https://www.tnesevai.tn.gov.in/Pages/ServiceList.aspx
+  type: e-Sevai service list
+  source_date: null
+  checked_on: '2026-11-28'
+  local_file: official/e-sevai-service-list-6f5ff859.md
+  quote: Indira Gandhi National Old Age Pension Scheme (IGNOPS) | Operator | - | 0 | 10 | 1. Applicant Photo 2. Aadhaar Card
+    3. Aadhaar Consent Form 4. Smart or Ration Card or Any Address Proof 5. Self-declaration of Applicant 6. Any Identity
+    Proof(Voter ID Card,Passport,PAN Card,Driving License) 7. Bank Passbook
+- id: pudukkottai
+  title: 'Pudukkottai district: social security schemes'
+  url: https://pudukkottai.nic.in/social-security-schemes/
+  type: district government page
+  source_date: '2026-05-11'
+  checked_on: '2026-11-28'
+  local_file: districts/social-security-schemes-3864f581.md
+  quote: Indira Gandhi National Old Age Pension | 1000 | 60 years and above who are incapacitated to earn Destitute Belonging
+    to below poverty line family Without any income or source of income owning fixed assets valuing less than Rs.50000/- who
+    have no relative of 18 years of age and over
+review: null
+government_order_verified: false

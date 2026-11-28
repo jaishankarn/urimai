@@ -1,0 +1,114 @@
+# Reviewer: compare conditions, amounts and checks with each source's quote and link.
+# When satisfied, set review to {by: your initials, on: date, checksum: output of
+#   cd backend && .venv/bin/python -m scripts.review_checksum national-family-benefit }
+# Any later change to conditions, checks or amounts makes the rule unreviewed again.
+id: national-family-benefit
+name:
+  en: National Family Benefit Scheme
+  ta: தேசிய குடும்ப நலத் திட்டம்
+aliases:
+- குடும்ப நல உதவித்தொகை
+- family benefit
+- NFBS
+- kudumba nala uthavi
+conditions:
+- id: husband_died
+  text:
+    en: Your husband has passed away
+    ta: உங்கள் கணவர் காலமானார்
+  kind: checkable
+  any_of:
+  - - fact: widowed
+      op: eq
+      value: 'yes'
+      unknown_values: []
+  source: nsap
+- id: bpl
+  text:
+    en: Your household is below the poverty line
+    ta: உங்கள் குடும்பம் வறுமைக் கோட்டிற்குக் கீழ் உள்ளது
+  kind: checkable
+  any_of:
+  - - fact: bpl_card
+      op: eq
+      value: 'yes'
+  source: nsap
+- id: main_earner
+  text:
+    en: He was the family's main earner
+    ta: அவர் குடும்பத்தின் முக்கிய வருமானம் ஈட்டியவர்
+  kind: checkable
+  any_of:
+  - - fact: husband_main_earner
+      op: eq
+      value: 'yes'
+  source: nsap
+- id: husband_age_min
+  text:
+    en: He was 18 or older when he died
+    ta: இறக்கும்போது அவர் வயது 18 அல்லது அதற்கு மேல்
+  kind: checkable
+  any_of:
+  - - fact: husband_age_at_death
+      op: min
+      value: 18
+  source: nsap
+- id: husband_age_max
+  text:
+    en: He was 59 or younger when he died
+    ta: இறக்கும்போது அவர் வயது 59 அல்லது அதற்குக் குறைவு
+  kind: checkable
+  any_of:
+  - - fact: husband_age_at_death
+      op: max
+      value: 59
+  source: nsap
+checks:
+- id: deadline
+  text:
+    en: We could not confirm the claim deadline. Ask now, because there may be one.
+    ta: கோரிக்கை அளிக்கக் கடைசி நாளை உறுதிப்படுத்த முடியவில்லை. கால வரம்பு இருக்கலாம், உடனே கேளுங்கள்.
+  source: null
+- id: documents
+  text:
+    en: Ask which documents are needed.
+    ta: தேவையான ஆவணங்களைக் கேளுங்கள்.
+  source: null
+- id: where_to_apply
+  text:
+    en: Ask where to apply in Tamil Nadu. We did not find it in the e-Sevai list.
+    ta: தமிழ்நாட்டில் எங்கு விண்ணப்பிப்பது என்று கேளுங்கள். இ-சேவைப் பட்டியலில் இது எங்களுக்குக் கிடைக்கவில்லை.
+  source: null
+conflicts: []
+amounts:
+- text:
+    en: ₹20,000 once, for the family
+    ta: குடும்பத்திற்கு ஒரு முறை ₹20,000
+  source: nsap
+  when: []
+documents:
+  confirmed: false
+  note:
+    en: Not confirmed. Ask the office.
+    ta: உறுதிப்படுத்தப்படவில்லை. அலுவலகத்தில் கேளுங்கள்.
+  items: []
+apply:
+  text:
+    en: Not confirmed. Ask the office.
+    ta: உறுதிப்படுத்தப்படவில்லை. அலுவலகத்தில் கேளுங்கள்.
+  service_code: null
+  charge_rupees: null
+  source: null
+sources:
+- id: nsap
+  title: National Social Assistance Programme (PIB, November 2025)
+  url: https://static.pib.gov.in/WriteReadData/specificdocs/documents/2025/nov/doc2025117686801.pdf
+  type: national government publication
+  source_date: 2025-11
+  checked_on: '2026-11-28'
+  local_file: official/pib-document-nsap-2025-7ae459f2.md
+  quote: a household living below the poverty line becomes eligible for lump sum financial assistance in the unfortunate event
+    of the death of its primary breadwinner, provided the deceased was between 18 and 59 years of age. The family receives
+    Rs.20,000
+review: null
+government_order_verified: false
