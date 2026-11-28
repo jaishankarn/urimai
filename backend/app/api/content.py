@@ -8,10 +8,13 @@ from app.contracts.content import Content
 LANGUAGES = ("en", "ta")
 
 
-def router(content_dir: Path) -> APIRouter:
+def load_lines(content_dir: Path) -> dict[str, Content]:
     # Read once at startup, so a broken file stops the app before anyone sees it.
-    lines = {lang: Content.model_validate(yaml.safe_load((content_dir / "lines" / f"{lang}.yaml").read_text(encoding="utf-8")))
-             for lang in LANGUAGES}
+    return {lang: Content.model_validate(yaml.safe_load((content_dir / "lines" / f"{lang}.yaml").read_text(encoding="utf-8")))
+            for lang in LANGUAGES}
+
+
+def router(lines: dict[str, Content]) -> APIRouter:
     api = APIRouter()
 
     @api.get("/api/content/{lang}")
