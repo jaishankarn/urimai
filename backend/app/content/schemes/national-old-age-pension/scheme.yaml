@@ -142,5 +142,8 @@ sources:
   quote: Indira Gandhi National Old Age Pension | 1000 | 60 years and above who are incapacitated to earn Destitute Belonging
     to below poverty line family Without any income or source of income owning fixed assets valuing less than Rs.50000/- who
     have no relative of 18 years of age and over
-review: null
+review:
+  by: JS
+  'on': '2026-11-28'
+  checksum: c4f44c88b3004df8a77ef11847e40a1cdf5f5e640714475182d2d5f78307b36b
 government_order_verified: false

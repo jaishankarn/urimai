@@ -168,5 +168,8 @@ sources:
   checked_on: '2026-11-28'
   local_file: official/e-sevai-service-list-6f5ff859.md
   quote: Claim Application-Construction Board-Funeral Expenses / Natural Death | Operator | - | 0 | 60
-review: null
+review:
+  by: JS
+  'on': '2026-11-28'
+  checksum: 3e6c47c8e37b1a3b1ed1dc60815a0437f7f7639d3260771415933ad5a0b33143
 government_order_verified: false

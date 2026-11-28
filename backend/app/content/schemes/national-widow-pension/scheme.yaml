@@ -158,5 +158,8 @@ sources:
   quote: Indira Gandhi National Widow Pension | 1000 | Should be a widow 40 years and above Destitute Belonging to below poverty
     line family Without any income or source of income owning fixed assets valuing less than Rs.50000/- who have no relative
     of 18 years of age and over of the following category son, son’s son and other related persons who normally live together
-review: null
+review:
+  by: JS
+  'on': '2026-11-28'
+  checksum: 1639466e2502468f17995a5cbc3327519458b453b2051e8d46fa93a4da7baa3b
 government_order_verified: false
