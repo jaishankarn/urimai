@@ -15,17 +15,23 @@ cd backend && .venv/bin/pytest tests/test_main.py::test_serves_built_frontend_be
 cd backend && .venv/bin/uvicorn app.main:app --reload --port 8001   # backend dev server
 cd frontend && npm run dev                 # Vite dev server, forwards /api to port 8001
 cd frontend && npm run build               # type check and build
+cd widget && npm run build:local           # build widget.js into backend/widget_dist for local runs
+cd widget && npm test                      # widget unit tests (Vitest, jsdom)
+cd widget && npm run e2e                   # Playwright, 6 scenarios (needs frontend built); `-- 3 6` runs some
 ```
 
-First-time setup is in `README.md`. There is no linter or frontend test framework.
+First-time setup is in `README.md`. There is no linter. The website has no test framework; the widget has Vitest and a Playwright end-to-end script.
 
 ## Architecture
 
-One container. The `Dockerfile` builds the React app (`frontend/`, Vite, TypeScript, Tailwind) in a Node stage, then copies it to `/app/static` in a Python stage, where FastAPI (`backend/app/main.py`) serves both `/api/*` and those files on port 3000.
+One container. The `Dockerfile` builds the React app (`frontend/`) and the voice form widget (`widget/`, one IIFE script, no runtime dependencies) in Node stages, then copies them to `/app/static` and `/app/widget_dist/v1/widget.js` in a Python stage, where FastAPI (`backend/app/main.py`) serves `/api/*`, `/widget/v1/widget.js`, the practice portal at `/portal/` and the website on port 3000.
 
 - Register API routes before the static mount at `/`, or the mount swallows them. The mount is skipped when `static/` is missing, as in local development and tests.
+- `AI_PROVIDER=local` (testing only) sends the AI step to an OpenAI-compatible local model at `LOCAL_AI_URL` (Compose profile `local-ai`); speech still uses Sarvam. The live Sarvam chat API takes `reasoning_effort` low, medium or high only, and reasoning counts against `max_tokens`.
 - `SARVAM_API_KEY` is read at runtime on the server only. Empty or the `.env.example` placeholder counts as not set. A new environment variable needs entries in both `docker-compose.yml` (with an empty default, no `env_file`) and `.env.example`.
-- The current app is a starter: the main screen, a language choice that translates nothing yet, and a disabled microphone button.
+- Voice form widget: form maps in `backend/app/content/forms/` (data only), widget lines in `content/lines/widget.{en,ta}.yaml` (same keys and placeholders, tested), routes in `backend/app/api/widget.py`, rule-based reply understanding in `backend/app/understand/` (AI fallback only when rules fail, and its values go back through the rules), the widget's Sarvam adapter in `backend/app/voice/widget_sarvam.py` (the journey uses `voice/sarvam.py`; folding them together is a follow-up). The sensitive-field detector exists twice (`contracts/forms.py`, `widget/src/dom/sensitive.ts`); keep them in step.
+- The practice portal (`backend/app/portal/`) is treated like a third-party site: it knows Urimai only through the one script line.
+- No validation of our own: form maps never encode a site's rules, and reply understanding only converts speech to values (digits, dates, options). The widget detects whatever the site reports (`widget/src/dom/errors.ts`) and relays it; keep it that way.
 
 ## Round 1 documents (`docs/`)
 

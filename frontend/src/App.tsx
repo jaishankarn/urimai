@@ -226,6 +226,7 @@ export default function App() {
             ? answerLabel(district, answers.district, ui.dont_know)
             : ''
         }
+        facts={toFacts(visible, answers)}
         onDocuments={(schemeId) => setStep({ name: 'documents', schemeId })}
         onBack={() => setStep({ name: 'confirm' })}
         onRestart={() => {

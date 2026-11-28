@@ -47,3 +47,15 @@ export const checkEligibility = (facts: Record<string, string | number>) =>
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(facts),
   }).then((body) => body.results)
+
+export type FormSummary = { form_id: string; title: Text; start_url: string; demo: boolean }
+
+export const getForms = (schemeId: string) => json<FormSummary[]>(`/api/forms?scheme_id=${encodeURIComponent(schemeId)}`)
+
+/** Confirmed answers go to the server in the body and come back as a one-time link for the application page. */
+export const startHandoff = (formId: string, lang: Lang, facts: Record<string, string | number>) =>
+  json<{ url: string }>('/api/handoff', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ form_id: formId, lang, facts }),
+  }).then((body) => body.url)
