@@ -1,0 +1,119 @@
+# Reviewer: compare conditions, amounts and checks with each source's quote and link.
+# When satisfied, set review to {by: your initials, on: date, checksum: output of
+#   cd backend && .venv/bin/python -m scripts.review_checksum pmsby }
+# Any later change to conditions, checks or amounts makes the rule unreviewed again.
+id: pmsby
+name:
+  en: Accident insurance through his bank account (PMSBY)
+  ta: வங்கிக் கணக்கு வழி விபத்துக் காப்பீடு (PMSBY)
+aliases:
+- விபத்துக் காப்பீடு
+- PMSBY
+- suraksha bima
+- bank accident insurance
+conditions:
+- id: accident
+  text:
+    en: He died in an accident
+    ta: அவர் விபத்தில் இறந்தார்
+  kind: checkable
+  any_of:
+  - - fact: death_cause
+      op: eq
+      value: accident
+  source: pmsby_post
+- id: enrolled
+  text:
+    en: A yearly accident insurance deduction (₹20) was taken from his account
+    ta: அவர் கணக்கிலிருந்து ஆண்டு விபத்துக் காப்பீட்டுத் தொகை (₹20) பிடிக்கப்பட்டது
+  kind: checkable
+  any_of:
+  - - fact: insurance_deduction
+      op: in
+      value:
+      - accident
+      - both
+  source: pmsby_post
+- id: husband_age_min
+  text:
+    en: He was 18 or older when he died
+    ta: இறக்கும்போது அவர் வயது 18 அல்லது அதற்கு மேல்
+  kind: checkable
+  any_of:
+  - - fact: husband_age_at_death
+      op: min
+      value: 18
+  source: pmsby_post_age
+- id: husband_age_max
+  text:
+    en: He was 70 or younger when he died
+    ta: இறக்கும்போது அவர் வயது 70 அல்லது அதற்குக் குறைவு
+  kind: checkable
+  any_of:
+  - - fact: husband_age_at_death
+      op: max
+      value: 70
+  source: pmsby_post_age
+checks:
+- id: cover_active
+  text:
+    en: The bank or insurer must confirm that the cover was active when he died.
+    ta: அவர் இறந்தபோது காப்பீடு நடப்பில் இருந்ததை வங்கி அல்லது காப்பீட்டு நிறுவனம் உறுதிப்படுத்த வேண்டும்.
+  source: null
+- id: deadline
+  text:
+    en: We could not confirm the claim deadline. Ask the bank now.
+    ta: கோரிக்கைக் கால வரம்பை உறுதிப்படுத்த முடியவில்லை. வங்கியில் உடனே கேளுங்கள்.
+  source: null
+- id: nominee
+  text:
+    en: Ask the bank who the nominee is.
+    ta: நியமனதாரர் யார் என்று வங்கியில் கேளுங்கள்.
+  source: null
+conflicts: []
+amounts:
+- text:
+    en: ₹2,00,000 for accidental death
+    ta: விபத்து மரணத்திற்கு ₹2,00,000
+  source: pmsby
+  when: []
+documents:
+  confirmed: false
+  note:
+    en: Not confirmed. Ask the office.
+    ta: உறுதிப்படுத்தப்படவில்லை. அலுவலகத்தில் கேளுங்கள்.
+  items: []
+apply:
+  text:
+    en: Not confirmed. Ask the office.
+    ta: உறுதிப்படுத்தப்படவில்லை. அலுவலகத்தில் கேளுங்கள்.
+  service_code: null
+  charge_rupees: null
+  source: null
+sources:
+- id: pmsby
+  title: PMSBY factsheet (PIB, May 2025)
+  url: https://static.pib.gov.in/WriteReadData/specificdocs/documents/2025/may/doc202558551401.pdf
+  type: national government publication
+  source_date: 2025-05
+  checked_on: '2026-11-28'
+  local_file: official/pib-factsheet-pmsby-2025-b19cf5fa.md
+  quote: the insurance benefit will still be limited to Rs. 2 lakh only.
+- id: pmsby_post
+  title: 'India Post: PMSBY'
+  url: https://www.indiapost.gov.in/insurance-services/pmsby
+  type: national government page
+  source_date: null
+  checked_on: '2026-11-28'
+  local_file: official/india-post-pmsby-5d6d9b00.md
+  quote: accidental death and disability cover for death or disability on account of an accident.
+- id: pmsby_post_age
+  title: 'India Post: PMSBY joining age'
+  url: https://www.indiapost.gov.in/insurance-services/pmsby
+  type: national government page
+  source_date: null
+  checked_on: '2026-11-28'
+  local_file: official/india-post-pmsby-5d6d9b00.md
+  quote: All savings bank account holders in the age 18 to 70 years in participating banks will be entitled to join.
+review: null
+government_order_verified: false
