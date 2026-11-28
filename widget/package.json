@@ -1,0 +1,18 @@
+{
+  "name": "urimai-widget",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit && vite build",
+    "build:test": "vite build --mode test",
+    "test": "vitest run",
+    "e2e": "npm run build:test && node tests/e2e/run.mjs",
+    "build:local": "npm run build && mkdir -p ../backend/widget_dist/v1 && cp dist/widget.js ../backend/widget_dist/v1/widget.js"
+  },
+  "devDependencies": {
+    "jsdom": "31.0.1",
+    "typescript": "7.0.2",
+    "vite": "8.4.0",
+    "vitest": "5.1.2"
+  }
+}
