@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { Content, Lang, Result } from '../api'
-import { card, link, primary, secondary, title } from './ui'
+import { card, link, primary, secondary, title, warning } from './ui'
 
 type Props = { ui: Content['ui']; lang: Lang; result: Result; onBack: () => void }
 
@@ -17,25 +17,25 @@ export default function Documents({ ui, lang, result, onBack }: Props) {
   }
 
   return (
-    <div className="flex w-full flex-col gap-4">
+    <div className="flex w-full flex-col gap-3 pt-3">
       <button type="button" className={`${link} self-start`} onClick={onBack}>
         ← {ui.back_to_results}
       </button>
       <h2 className={title}>
         {ui.documents_title}: {result.name[lang]}
       </h2>
-      {note && <p className="rounded-lg border border-amber-600 p-3 text-base">{note[lang]}</p>}
+      {note && <p className={warning}>{note[lang]}</p>}
 
-      {!confirmed && <p className={`${card} text-xl`}>{ui.not_confirmed}</p>}
+      {!confirmed && <p className={`${card}`}>{ui.not_confirmed}</p>}
 
       {confirmed && item && (
         <div className={card}>
-          <p className="text-base text-stone-700">
+          <p className="text-base text-muted">
             {ui.document_of.replace('{n}', String(index + 1)).replace('{total}', String(items.length))}
           </p>
-          <p className="my-3 text-2xl font-semibold">{item.text[lang]}</p>
+          <p className="my-3 text-lg font-semibold">{item.text[lang]}</p>
           {item.how && (
-            <p className="mb-3 text-lg">
+            <p className="mb-3 text-base">
               <strong>{ui.how_to_get}:</strong> {item.how[lang]}
             </p>
           )}
@@ -53,11 +53,11 @@ export default function Documents({ ui, lang, result, onBack }: Props) {
       {confirmed && !item && (
         <div className={card}>
           {missing.length === 0 ? (
-            <p className="text-xl">{ui.have_all}</p>
+            <p className="font-semibold">{ui.have_all}</p>
           ) : (
             <>
-              <h3 className="text-xl font-bold">{ui.still_need}</h3>
-              <ul className="list-disc pl-5 text-lg">
+              <h3 className="font-bold">{ui.still_need}</h3>
+              <ul className="list-disc pl-5 text-base">
                 {items
                   .filter((entry) => missing.includes(entry.id))
                   .map((entry) => (

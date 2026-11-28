@@ -19,8 +19,8 @@ type Props = {
 
 export default function Language({ lang, content, voiceReady, onLanguage, onStart, onTalk }: Props) {
   return (
-    <div className="flex w-full flex-col items-center gap-6 text-center">
-      <p className="text-lg">{content?.ui.tagline ?? 'Your Voice. Your Rights. Your Benefits.'}</p>
+    <div className="flex w-full flex-col items-center gap-4 text-center">
+      <p className="font-semibold text-brand">{content?.ui.tagline ?? 'Your Voice. Your Rights. Your Benefits.'}</p>
       <div role="group" aria-label="Choose a language" className="grid w-full grid-cols-2 gap-3">
         {LANGUAGES.map(({ code, label, ready }) => (
           <button
@@ -29,16 +29,16 @@ export default function Language({ lang, content, voiceReady, onLanguage, onStar
             disabled={!ready}
             aria-pressed={lang === code}
             onClick={() => onLanguage(code as Lang)}
-            className="min-h-14 rounded-xl border-2 border-emerald-800 bg-white text-xl font-semibold aria-pressed:bg-emerald-800 aria-pressed:text-white disabled:border-stone-300 disabled:bg-stone-100 disabled:text-stone-500"
+            className="min-h-14 rounded-2xl border border-edge bg-surface text-lg font-semibold text-brand aria-pressed:border-fill-edge aria-pressed:bg-fill aria-pressed:text-on-fill disabled:border-line disabled:bg-page disabled:text-muted"
           >
             <span lang={code}>{label}</span>
-            {!ready && <span className="block text-sm font-normal">coming soon</span>}
+            {!ready && <span className="block text-base font-normal">coming soon</span>}
           </button>
         ))}
       </div>
       {content && (
         <>
-          <p className="text-lg">{content.ui.intro}</p>
+          <p>{content.ui.intro}</p>
           {voiceReady && (
             <button type="button" className={primary} onClick={onTalk}>
               {content.ui.talk_button}
@@ -47,8 +47,8 @@ export default function Language({ lang, content, voiceReady, onLanguage, onStar
           <button type="button" className={voiceReady ? secondary : primary} onClick={onStart}>
             {voiceReady ? content.ui.tap_button : content.ui.start}
           </button>
-          {!voiceReady && <p className="text-base text-stone-700">{content.ui.no_key_voice}</p>}
-          <p className="text-base text-stone-700">{content.ui.memory_note}</p>
+          {!voiceReady && <p className="text-base text-muted">{content.ui.no_key_voice}</p>}
+          <p className="text-base text-muted">{content.ui.memory_note}</p>
         </>
       )}
     </div>

@@ -1,1 +1,112 @@
 @import "tailwindcss";
+@import "@fontsource-variable/noto-sans";
+@import "@fontsource-variable/noto-sans-tamil";
+
+/*
+ * Urimai design tokens. Components use only these names, so a theme is just a set of values.
+ * fill / on-fill: main buttons and the person's replies. brand: coloured text and outlines. head: the chat header.
+ */
+@theme {
+  --font-sans: 'Noto Sans Variable', 'Noto Sans Tamil Variable', system-ui, sans-serif;
+  --color-fill: #66509c;
+  --color-on-fill: #ffffff;
+  --color-fill-edge: #66509c;
+  --color-brand: #5b468f;
+  --color-head: #54417f;
+  --color-page: #f6f4fb;
+  --color-surface: #ffffff;
+  --color-tint: #ece7f8;
+  --color-line: #e2ddef;
+  --color-edge: #b9acdc;
+  --color-ink: #1e182c;
+  --color-muted: #5c556e;
+  --color-gold: #f4c152;
+  --color-on-gold: #221a05;
+  --color-warn: #8a4b08;
+  --color-warn-tint: #fdf3e1;
+  --color-warn-line: #b7791f;
+  --color-danger: #991b1b;
+  --shadow-soft: 0 1px 2px #0000000f, 0 8px 28px #00000014;
+  --animate-arrive: arrive 0.35s ease-out both;
+  @keyframes arrive {
+    from { opacity: 0; transform: translateY(6px); }
+  }
+}
+
+/* Each theme gives a light and a dark value; color-scheme picks between them. */
+:root, [data-theme='lavender'] {
+  --color-fill: light-dark(#66509c, #c5b3f2);
+  --color-on-fill: light-dark(#ffffff, #1f1240);
+  --color-fill-edge: light-dark(#66509c, #c5b3f2);
+  --color-brand: light-dark(#5b468f, #d3c5f7);
+  --color-head: light-dark(#54417f, #34285a);
+  --color-page: light-dark(#f6f4fb, #121017);
+  --color-surface: light-dark(#ffffff, #1b1823);
+  --color-tint: light-dark(#ece7f8, #2d2544);
+  --color-line: light-dark(#e2ddef, #373147);
+  --color-edge: light-dark(#b9acdc, #5a4f7c);
+  --color-ink: light-dark(#1e182c, #efecf7);
+  --color-muted: light-dark(#5c556e, #b6afc9);
+}
+[data-theme='mint'] {
+  --color-fill: light-dark(#065f46, #5fd3a6);
+  --color-on-fill: light-dark(#ffffff, #06251a);
+  --color-fill-edge: light-dark(#065f46, #5fd3a6);
+  --color-brand: light-dark(#065f46, #7fe0b8);
+  --color-head: light-dark(#065f46, #0f3d2e);
+  --color-page: light-dark(#f1f8f4, #0d1512);
+  --color-surface: light-dark(#ffffff, #15201b);
+  --color-tint: light-dark(#e2f1e9, #1c3329);
+  --color-line: light-dark(#dbe8e1, #2a3d34);
+  --color-edge: light-dark(#9cc4b1, #3f6554);
+  --color-ink: light-dark(#13241c, #e8f2ed);
+  --color-muted: light-dark(#52665c, #a3b8ad);
+}
+[data-theme='marigold'] {
+  --color-fill: light-dark(#f5b32f, #f5b93f);
+  --color-on-fill: light-dark(#241a02, #231800);
+  /* Marigold is faint against white, so its buttons get a darker edge. */
+  --color-fill-edge: light-dark(#8a5d00, #f5b93f);
+  --color-brand: light-dark(#6f4a00, #f9cb6c);
+  --color-head: light-dark(#262624, #262624);
+  --color-page: light-dark(#f7f7f5, #111110);
+  --color-surface: light-dark(#ffffff, #1b1b19);
+  --color-tint: light-dark(#fdefcd, #332a14);
+  --color-line: light-dark(#e6e4de, #383732);
+  --color-edge: light-dark(#c9a45a, #6b5a2c);
+  --color-ink: light-dark(#1d1d1b, #f1f0ea);
+  --color-muted: light-dark(#5a5953, #b4b2a8);
+}
+[data-theme='terracotta'] {
+  --color-fill: light-dark(#9a3b20, #f0a387);
+  --color-on-fill: light-dark(#ffffff, #2f1007);
+  --color-fill-edge: light-dark(#9a3b20, #f0a387);
+  --color-brand: light-dark(#8c351c, #f6b7a0);
+  --color-head: light-dark(#82311a, #4c2317);
+  --color-page: light-dark(#faf6f5, #15100f);
+  --color-surface: light-dark(#ffffff, #201917);
+  --color-tint: light-dark(#f8e7e1, #3a231c);
+  --color-line: light-dark(#ecdfda, #43322d);
+  --color-edge: light-dark(#d3a799, #704a3e);
+  --color-ink: light-dark(#2a1812, #f6ece9);
+  --color-muted: light-dark(#6d574f, #c0aca5);
+}
+/* Warnings and errors keep their meaning in every theme. */
+:root, [data-theme] {
+  --color-warn: light-dark(#8a4b08, #f6c77e);
+  --color-warn-tint: light-dark(#fdf3e1, #33270f);
+  --color-warn-line: light-dark(#b7791f, #a87a2a);
+  --color-danger: light-dark(#991b1b, #fca5a5);
+}
+
+:root { color-scheme: light dark; }
+:root[data-mode='light'] { color-scheme: light; }
+:root[data-mode='dark'] { color-scheme: dark; }
+body { background: var(--color-page); color: var(--color-ink); }
+
+button:not(:disabled), summary { cursor: pointer; }
+:focus-visible { outline: 3px solid #f59e0b; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; }
+}

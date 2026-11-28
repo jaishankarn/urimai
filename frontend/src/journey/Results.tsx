@@ -1,11 +1,66 @@
 import type { Content, Lang, Outcome, Result } from '../api'
-import { card, link, secondary, title } from './ui'
+import Icon from './icons'
+import { card, link, secondary, title, warning } from './ui'
 
 const GROUPS: { outcome: Outcome; style: string }[] = [
-  { outcome: 'potentially_eligible', style: 'border-emerald-700 bg-emerald-100 text-emerald-950' },
-  { outcome: 'needs_more_information', style: 'border-amber-600 bg-amber-100 text-amber-950' },
-  { outcome: 'appears_ineligible', style: 'border-stone-400 bg-stone-200 text-stone-900' },
+  { outcome: 'potentially_eligible', style: 'border-edge bg-tint text-brand' },
+  { outcome: 'needs_more_information', style: 'border-warn-line bg-warn-tint text-warn' },
+  { outcome: 'appears_ineligible', style: 'border-line bg-line text-ink' },
 ]
+
+type PartProps = { ui: Content['ui']; lang: Lang; result: Result }
+const heading = 'mt-3 font-bold'
+
+export function Checks({ ui, lang, result }: PartProps) {
+  if (result.checks.length === 0) return null
+  return (
+    <>
+      <h5 className={heading}>{ui.checks}</h5>
+      <ul className="list-disc pl-5">
+        {result.checks.map((check) => (
+          <li key={check.id}>{check.text[lang]}</li>
+        ))}
+      </ul>
+    </>
+  )
+}
+
+export function Conflicts({ ui, lang, result }: PartProps) {
+  if (result.conflicts.length === 0) return null
+  return (
+    <div className={`${warning} mt-3`}>
+      <h5 className="flex items-start gap-2 font-bold text-warn">
+        <Icon name="alert" className="mt-0.5 size-5" /> {ui.conflicts}
+      </h5>
+      <ul className="list-disc pl-5">
+        {result.conflicts.map((conflict) => (
+          <li key={conflict.id}>{conflict.text[lang]}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+export function Sources({ ui, result }: { ui: Content['ui']; result: Result }) {
+  return (
+    <details className="mt-3">
+      <summary className="min-h-12 content-center font-semibold text-brand">
+        {ui.sources} ({result.sources.length})
+      </summary>
+      <ul className="flex flex-col gap-2">
+        {result.sources.map((source) => (
+          <li key={source.id} className="break-words">
+            <a className="text-brand underline" href={source.url} target="_blank" rel="noreferrer">
+              {source.title}
+            </a>
+            <br />
+            {ui.source_date}: {source.source_date ?? ui.date_unknown} · {ui.checked_on}: {source.checked_on}
+          </li>
+        ))}
+      </ul>
+    </details>
+  )
+}
 
 type CardProps = { ui: Content['ui']; lang: Lang; result: Result; district: string; onDocuments: () => void }
 
@@ -14,20 +69,19 @@ function Card({ ui, lang, result, district, onDocuments }: CardProps) {
   // Amounts, how to apply and documents appear only for a reviewed rule that has not been ruled out.
   const actionable = result.reviewed && !ineligible
   const group = GROUPS.find((g) => g.outcome === result.outcome)!
-  const heading = 'mt-3 text-lg font-bold'
 
   return (
     <article className={card} data-scheme={result.scheme_id} data-outcome={result.outcome}>
-      <h4 className="text-xl font-bold">{result.name[lang]}</h4>
-      <p className={`mt-2 inline-block rounded-lg border px-3 py-1 text-lg font-semibold ${group.style}`}>
+      <h4 className="font-bold">{result.name[lang]}</h4>
+      <p className={`mt-2 inline-block rounded-lg border px-3 py-1 font-semibold ${group.style}`}>
         {ui[`outcome_${result.outcome}`]}
       </p>
-      {!result.reviewed && <p className="mt-2 text-lg font-semibold text-red-800">{ui.not_reviewed}</p>}
+      {!result.reviewed && <p className="mt-2 text-base font-semibold text-danger">{ui.not_reviewed}</p>}
 
       {!ineligible && result.amounts.length > 0 && (
         <>
           <h5 className={heading}>{ui.amounts}</h5>
-          <ul className="list-disc pl-5 text-lg">
+          <ul className="list-disc pl-5 text-base">
             {result.amounts.map((amount) => (
               <li key={amount.en}>{amount[lang]}</li>
             ))}
@@ -38,9 +92,9 @@ function Card({ ui, lang, result, district, onDocuments }: CardProps) {
       {result.conditions.length > 0 && (
         <>
           <h5 className={heading}>{ui.reasons}</h5>
-          <ul className="text-lg">
+          <ul className="text-base">
             {result.conditions.map((condition) => (
-              <li key={condition.id} className="border-b border-stone-200 py-1">
+              <li key={condition.id} className="border-b border-line py-1">
                 {condition.text[lang]} — <strong>{ui[`status_${condition.status}`]}</strong>
               </li>
             ))}
@@ -48,66 +102,32 @@ function Card({ ui, lang, result, district, onDocuments }: CardProps) {
         </>
       )}
 
-      {!ineligible && (
-        <>
-          <h5 className={heading}>{ui.checks}</h5>
-          <ul className="list-disc pl-5 text-lg">
-            {result.checks.map((check) => (
-              <li key={check.id}>{check.text[lang]}</li>
-            ))}
-          </ul>
-        </>
-      )}
-
-      {result.conflicts.length > 0 && (
-        <div className="mt-3 rounded-lg border border-amber-600 p-3">
-          <h5 className="text-lg font-bold">{ui.conflicts}</h5>
-          <ul className="list-disc pl-5 text-base">
-            {result.conflicts.map((conflict) => (
-              <li key={conflict.id}>{conflict.text[lang]}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {!ineligible && <Checks ui={ui} lang={lang} result={result} />}
+      <Conflicts ui={ui} lang={lang} result={result} />
 
       {actionable && (
         <>
           <h5 className={heading}>{ui.apply}</h5>
-          <p className="text-lg">{result.apply.text[lang]}</p>
+          <p className="text-base">{result.apply.text[lang]}</p>
           {result.apply.service_code && (
-            <p className="text-lg">
+            <p className="text-base">
               {ui.service_code}: {result.apply.service_code}
             </p>
           )}
           {result.apply.charge_rupees !== null && (
-            <p className="text-lg">
+            <p className="text-base">
               {ui.charge}: ₹{result.apply.charge_rupees}
             </p>
           )}
           {district && (
-            <p className="text-lg">
+            <p className="text-base">
               {ui.your_district}: {district}
             </p>
           )}
         </>
       )}
 
-      <details className="mt-3">
-        <summary className="min-h-12 cursor-pointer text-lg font-semibold">
-          {ui.sources} ({result.sources.length})
-        </summary>
-        <ul className="flex flex-col gap-2">
-          {result.sources.map((source) => (
-            <li key={source.id} className="text-base break-words">
-              <a className="text-emerald-900 underline" href={source.url} target="_blank" rel="noreferrer">
-                {source.title}
-              </a>
-              <br />
-              {ui.source_date}: {source.source_date ?? ui.date_unknown} · {ui.checked_on}: {source.checked_on}
-            </li>
-          ))}
-        </ul>
-      </details>
+      <Sources ui={ui} result={result} />
 
       {actionable && (
         <button type="button" className={`${secondary} mt-3`} onClick={onDocuments}>
@@ -124,43 +144,38 @@ type Props = {
   results: Result[]
   district: string
   onDocuments: (schemeId: string) => void
-  onBack: () => void
-  onRestart: () => void
+  /** Back to the top suggestions, when there are any. */
+  onBack?: () => void
 }
 
-export default function Results({ ui, lang, results, district, onDocuments, onBack, onRestart }: Props) {
+export default function Results({ ui, lang, results, district, onDocuments, onBack }: Props) {
   return (
-    <div className="flex w-full flex-col gap-4">
-      <button type="button" className={`${link} self-start`} onClick={onBack}>
-        ← {ui.back}
-      </button>
-      <h2 className={title}>{ui.results_title}</h2>
-      <p className="text-lg font-semibold">{ui.no_guarantee}</p>
-      <p className="text-base text-stone-700">{ui.amounts_note}</p>
+    <div className="flex w-full flex-col gap-3 pt-3">
+      {onBack && (
+        <button type="button" className={`${link} self-start`} onClick={onBack}>
+          ← {ui.back_to_top}
+        </button>
+      )}
       {GROUPS.map(({ outcome }) => {
         const found = results.filter((result) => result.outcome === outcome)
         if (found.length === 0) return null
-        return (
+        const label = `${ui[`outcome_${outcome}`]} (${found.length})`
+        const cards = found.map((result) => (
+          <Card key={result.scheme_id} ui={ui} lang={lang} result={result} district={district} onDocuments={() => onDocuments(result.scheme_id)} />
+        ))
+        // Benefits that appear not to apply stay closed until asked for.
+        return outcome === 'appears_ineligible' ? (
+          <details key={outcome}>
+            <summary className={`${title} min-h-12 content-center`}>{label}</summary>
+            <div className="flex flex-col gap-3">{cards}</div>
+          </details>
+        ) : (
           <section key={outcome} className="flex flex-col gap-3">
-            <h3 className="text-xl font-bold">
-              {ui[`outcome_${outcome}`]} ({found.length})
-            </h3>
-            {found.map((result) => (
-              <Card
-                key={result.scheme_id}
-                ui={ui}
-                lang={lang}
-                result={result}
-                district={district}
-                onDocuments={() => onDocuments(result.scheme_id)}
-              />
-            ))}
+            <h3 className={title}>{label}</h3>
+            {cards}
           </section>
         )
       })}
-      <button type="button" className={secondary} onClick={onRestart}>
-        {ui.start_again}
-      </button>
     </div>
   )
 }
