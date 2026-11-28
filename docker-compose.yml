@@ -1,7 +1,31 @@
 services:
+  db:
+    image: pgvector/pgvector:0.8.7-pg17
+    environment:
+      POSTGRES_USER: urimai
+      POSTGRES_DB: urimai
+      # A local default, not a secret: the database port is not published. Set your own for a public deployment,
+      # before the database is first created.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-urimai_local}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Over TCP: during first-time setup Postgres listens only on its local socket and is not ready yet.
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "urimai", "-d", "urimai"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
   app:
     build: .
     ports:
       - "3000:3000"
     environment:
       SARVAM_API_KEY: ${SARVAM_API_KEY:-}
+      DATABASE_URL: postgresql://urimai:${POSTGRES_PASSWORD:-urimai_local}@db:5432/urimai
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
