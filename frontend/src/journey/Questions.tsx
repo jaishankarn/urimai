@@ -1,6 +1,8 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, type ReactNode } from 'react'
 import type { Content, Question } from '../api'
-import { link, primary, secondary, title } from './ui'
+import Chat, { Bot, type Turn } from './Chat'
+import Icon from './icons'
+import { chip, field, pill, primary } from './ui'
 
 type Props = {
   ui: Content['ui']
@@ -10,10 +12,17 @@ type Props = {
   answer: string | undefined
   onAnswer: (value: string) => void
   onBack: () => void
+  onReplay?: () => void
+  log: Turn[]
+  /** The question in the other language. */
+  sub?: string
+  subLang: string
+  /** The microphone, when the person is talking. */
+  mic?: ReactNode
 }
 
 /** One question at a time. Render with key={question.id} so typed input resets between questions. */
-export default function Questions({ ui, question, position, total, answer, onAnswer, onBack }: Props) {
+export default function Questions({ ui, question, position, total, answer, onAnswer, onBack, onReplay, log, sub, subLang, mic }: Props) {
   const [typed, setTyped] = useState(answer && answer !== 'unknown' ? answer : '')
   const [invalid, setInvalid] = useState(false)
   const range = { min: question.min ?? 0, max: question.max ?? 120 }
@@ -29,42 +38,22 @@ export default function Questions({ ui, question, position, total, answer, onAns
     else setInvalid(true)
   }
 
-  return (
-    <div className="flex w-full flex-col gap-4">
-      <button type="button" className={`${link} self-start`} onClick={onBack}>
-        ← {ui.back}
+  // A few answers sit with the quick replies. A longer list stays in the conversation, so none of it is hidden.
+  const quick = question.type === 'choice' && (question.options?.length ?? 0) <= 4
+  const choices = (style: string) =>
+    question.options?.map((option) => (
+      <button key={option.value} type="button" aria-pressed={answer === option.value} className={style} onClick={() => onAnswer(option.value)}>
+        {option.label}
       </button>
-      {total > 0 && (
-        <p className="text-base text-stone-700">
-          {ui.question_of.replace('{n}', String(position)).replace('{total}', String(total))}
-        </p>
-      )}
-      <h2 id="question" className={title}>
-        {question.text}
-      </h2>
+    ))
 
-      {question.type === 'choice' &&
-        question.options?.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            aria-pressed={answer === option.value}
-            className={`${secondary} aria-pressed:bg-emerald-100`}
-            onClick={() => onAnswer(option.value)}
-          >
-            {option.label}
-          </button>
-        ))}
-
+  const replies = (
+    <>
+      {quick && choices(chip)}
       {question.type !== 'choice' && (
-        <form onSubmit={submit} className="flex flex-col gap-3" noValidate>
+        <form onSubmit={submit} className="flex w-full flex-wrap gap-2" noValidate>
           {question.type === 'select' ? (
-            <select
-              aria-labelledby="question"
-              value={typed}
-              onChange={(event) => setTyped(event.target.value)}
-              className="min-h-14 w-full rounded-xl border-2 border-stone-400 bg-white px-3 text-xl"
-            >
+            <select aria-labelledby="question" value={typed} onChange={(event) => setTyped(event.target.value)} className={`${field} min-w-0 flex-1`}>
               <option value="">—</option>
               {question.options?.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -83,24 +72,48 @@ export default function Questions({ ui, question, position, total, answer, onAns
                 setTyped(event.target.value)
                 setInvalid(false)
               }}
-              className="min-h-14 w-full rounded-xl border-2 border-stone-400 bg-white px-3 text-center text-3xl"
+              className={`${field} min-w-0 flex-1 basis-40`}
             />
           )}
-          {invalid && (
-            <p role="alert" className="text-lg text-red-800">
-              {ui.number_invalid.replace('{min}', String(range.min)).replace('{max}', String(range.max))}
-            </p>
-          )}
-          <button type="submit" className={primary} disabled={!typed}>
+          <button type="submit" className={`${primary} !w-auto`} disabled={!typed}>
             {ui.next}
           </button>
           {question.type === 'number' && (
-            <button type="button" className={secondary} onClick={() => onAnswer('unknown')}>
+            <button type="button" className={`${chip} grow`} onClick={() => onAnswer('unknown')}>
               {ui.dont_know}
             </button>
           )}
+          {invalid && (
+            <p role="alert" className="w-full text-danger">
+              {ui.number_invalid.replace('{min}', String(range.min)).replace('{max}', String(range.max))}
+            </p>
+          )}
         </form>
       )}
-    </div>
+      <button type="button" className={chip} onClick={onBack}>
+        ← {ui.back}
+      </button>
+      {onReplay && (
+        <button type="button" className={chip} onClick={onReplay}>
+          {ui.replay} <Icon name="again" className="inline size-4" />
+        </button>
+      )}
+    </>
+  )
+
+  return (
+    <Chat log={log} subLang={subLang} at={question.id} replies={replies} mic={mic}>
+      {total > 0 && <p className="text-muted">{ui.question_of.replace('{n}', String(position)).replace('{total}', String(total))}</p>}
+      <Bot sub={sub} subLang={subLang}>
+        <h2 id="question" className="font-semibold">
+          {question.text}
+        </h2>
+      </Bot>
+      {question.type === 'choice' && !quick && (
+        <div role="group" aria-labelledby="question" className="flex flex-wrap gap-2">
+          {choices(pill)}
+        </div>
+      )}
+    </Chat>
   )
 }

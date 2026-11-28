@@ -2,18 +2,26 @@ import { useEffect, useRef, useState } from 'react'
 import type { Content, Lang } from '../api'
 import { hush, nextQuestion, say, understand, type Facts } from '../voice'
 import { answerLabel, toFacts, visibleQuestions, type Answers } from './answers'
+import Chat, { Bot, type Turn } from './Chat'
 import Mic from './Mic'
 import Questions from './Questions'
-import { card, link, primary, secondary, title } from './ui'
+import { card, chip, primary, title } from './ui'
 
 type Props = {
   content: Content
+  /** The same text in the other language, for the second line of each bubble. */
+  other: Content
   lang: Lang
   answers: Answers
   onAnswers: (answers: Answers) => void
   /** Nothing more to ask: the person now checks every answer. `speech` is said once that screen is shown. */
   onFinished: (speech: string[]) => void
   onLeave: () => void
+  /** The conversation so far. The parent keeps it, so it stays on screen after this part ends. */
+  log: Turn[]
+  onLog: (turns: Turn[]) => void
+  /** A detail the person chose to change: ask that question again. */
+  change: { id: string } | null
 }
 
 type Stage =
@@ -23,12 +31,11 @@ type Stage =
   | { name: 'question'; id: string }
 
 /** The spoken part of the journey. Code chooses every question; the AI only turns replies into suggestions. */
-export default function Talk({ content, lang, answers, onAnswers, onFinished, onLeave }: Props) {
+export default function Talk({ content, other, lang, answers, onAnswers, onFinished, onLeave, log, onLog, change }: Props) {
   const { ui, questions } = content
   const [stage, setStage] = useState<Stage>({ name: 'consent' })
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState('')
-  const [noted, setNoted] = useState<{ said: string; id: string; value: string } | null>(null)
   // Every move to a new step gets a number, so a late reply from an earlier step is ignored.
   const step = useRef(0)
   // Questions already passed, so that Back goes to the previous one.
@@ -53,7 +60,6 @@ export default function Talk({ content, lang, answers, onAnswers, onFinished, on
     setProblem('')
     setBusy(false)
     setStage(next)
-    window.scrollTo(0, 0)
     say(speech, lang)
   }
 
@@ -77,7 +83,16 @@ export default function Talk({ content, lang, answers, onAnswers, onFinished, on
     }
   }
 
-  async function hear(said: string, questionId: string | null) {
+  const otherLang = lang === 'en' ? 'ta' : 'en'
+  /** One of Urimai's lines, in both languages. */
+  const line = (key: string): Turn => ({ from: 'urimai', text: ui[key], sub: other.ui[key] })
+  const asked = (id: string): Turn => ({
+    from: 'urimai',
+    text: questions.find((q) => q.id === id)!.text,
+    sub: other.questions.find((q) => q.id === id)!.text,
+  })
+
+  async function hear(said: string, questionId: string | null, aloud: boolean) {
     const mine = step.current
     setBusy(true)
     setProblem('')
@@ -86,6 +101,7 @@ export default function Talk({ content, lang, answers, onAnswers, onFinished, on
       if (mine !== step.current) return
       setBusy(false)
       if (questionId === null) {
+        onLog([line('say_greeting'), { from: 'me', text: said, spoken: aloud }])
         const lines = Object.entries(facts).map(([id, value]) => spoken(id, String(value)))
         return go(
           { name: 'check', said, found: facts },
@@ -94,11 +110,15 @@ export default function Talk({ content, lang, answers, onAnswers, onFinished, on
       }
       const value = questionId in facts ? String(facts[questionId]) : dont_know ? 'unknown' : undefined
       if (value === undefined) {
-        setNoted(null)
         setProblem(ui.not_caught)
         return say([ui.not_caught], lang)
       }
-      setNoted({ said, id: questionId, value })
+      const noted = spoken(questionId, value)
+      onLog([
+        asked(questionId),
+        { from: 'me', text: said, spoken: aloud },
+        { from: 'urimai', text: `${ui[`label_${questionId}`]}: ${noted.answer}`, badge: ui.last_answer },
+      ])
       askNext({ ...answers, [questionId]: value }, [`${ui.last_answer}: ${spoken(questionId, value).answer}.`])
     } catch {
       if (mine !== step.current) return
@@ -107,129 +127,168 @@ export default function Talk({ content, lang, answers, onAnswers, onFinished, on
     }
   }
 
+  // The person tapped "change" on the summary: ask that question here, with the microphone.
+  useEffect(() => {
+    if (!change) return
+    if (stage.name === 'question' && stage.id !== change.id) passed.current.push(stage.id)
+    go({ name: 'question', id: change.id }, [questions.find((q) => q.id === change.id)!.text])
+  }, [change])
+
   function previousQuestion() {
-    setNoted(null)
     const previous = passed.current.pop()
     go(previous ? { name: 'question', id: previous } : { name: 'story' }, previous ? [questions.find((q) => q.id === previous)!.text] : [])
   }
 
   const back = (
-    <button
-      type="button"
-      className={`${link} self-start`}
-      onClick={stage.name === 'check' ? () => go({ name: 'story' }, []) : onLeave}
-    >
+    <button type="button" className={chip} onClick={stage.name === 'check' ? () => go({ name: 'story' }, []) : onLeave}>
       ← {ui.back}
     </button>
   )
   const alert = problem && (
-    <p role="alert" className="text-lg text-red-800">
+    <p role="alert" className="w-full text-center text-danger">
       {problem}
     </p>
+  )
+  // The microphone. A new key for each step throws away a recording from the step before.
+  const mic = (key: string, questionId: string | null) => (
+    <>
+      {alert}
+      <Mic key={key} ui={ui} otherUi={other.ui} lang={lang} busy={busy} onSaid={(text, aloud) => hear(text, questionId, aloud)} />
+    </>
   )
 
   if (stage.name === 'consent') {
     return (
-      <div className="flex w-full flex-col gap-4">
-        {back}
-        <p className={`${card} text-lg`}>{ui.consent}</p>
-        <button type="button" className={primary} onClick={() => go({ name: 'story' }, [ui.say_greeting])}>
-          {ui.talk_start}
-        </button>
-      </div>
+      <Chat
+        log={log}
+        subLang={otherLang}
+        at="consent"
+        replies={
+          <>
+            <button
+              type="button"
+              className={primary}
+              onClick={() => {
+                onLog([line('consent'), { from: 'me', text: ui.talk_start }])
+                go({ name: 'story' }, [ui.say_greeting])
+              }}
+            >
+              {ui.talk_start}
+            </button>
+            {back}
+          </>
+        }
+      >
+        <Bot sub={other.ui.consent} subLang={otherLang}>
+          {ui.consent}
+        </Bot>
+      </Chat>
     )
   }
 
   if (stage.name === 'story') {
     return (
-      <div className="flex w-full flex-col items-center gap-4 text-center">
-        {back}
-        <h2 className={title}>{ui.say_greeting}</h2>
-        <button type="button" className={link} onClick={() => say([ui.say_greeting], lang)}>
-          {ui.replay}
-        </button>
-        <Mic key="story" ui={ui} lang={lang} busy={busy} onSaid={(text) => hear(text, null)} />
-        {alert}
-        <button type="button" className={link} onClick={() => askNext(answers)}>
-          {ui.story_skip}
-        </button>
-      </div>
+      <Chat
+        log={log}
+        subLang={otherLang}
+        at="story"
+        mic={mic('story', null)}
+        replies={
+          <>
+            {back}
+            <button type="button" className={chip} onClick={() => say([ui.say_greeting], lang)}>
+              {ui.replay}
+            </button>
+            <button type="button" className={chip} onClick={() => askNext(answers)}>
+              {ui.story_skip}
+            </button>
+          </>
+        }
+      >
+        <Bot sub={other.ui.say_greeting} subLang={otherLang}>
+          <h2 className="font-semibold">{ui.say_greeting}</h2>
+        </Bot>
+      </Chat>
     )
   }
 
   if (stage.name === 'check') {
     const found = Object.entries(stage.found)
+    const heading = found.length ? 'understood' : 'understood_none'
     return (
-      <div className="flex w-full flex-col gap-4">
-        {back}
-        <div className={card}>
-          <p className="text-base text-stone-700">{ui.you_said}</p>
-          <p className="text-xl" data-transcript>
-            {stage.said}
-          </p>
-        </div>
-        <h2 className={title}>{found.length ? ui.understood : ui.understood_none}</h2>
-        <ul className="flex flex-col gap-2">
-          {found.map(([id, value]) => {
-            const line = spoken(id, String(value))
-            return (
-              <li key={id} className={card} data-understood={id}>
-                <p className="text-base text-stone-700">{line.question}</p>
-                <p className="text-xl font-semibold">{line.answer}</p>
-              </li>
-            )
-          })}
-        </ul>
+      <Chat
+        log={log}
+        subLang={otherLang}
+        at="check"
+        replies={
+          <>
+            {found.length > 0 && (
+              <button
+                type="button"
+                className={primary}
+                disabled={busy}
+                onClick={() => {
+                  onLog([{ from: 'me', text: ui.story_yes }])
+                  askNext({ ...answers, ...Object.fromEntries(found.map(([id, v]) => [id, String(v)])) })
+                }}
+              >
+                {ui.story_yes}
+              </button>
+            )}
+            <button type="button" className={chip} disabled={busy} onClick={() => go({ name: 'story' }, [ui.say_greeting])}>
+              {ui.story_again}
+            </button>
+            {alert}
+          </>
+        }
+      >
+        <Bot sub={other.ui[heading]} subLang={otherLang}>
+          <h2 className={title}>{ui[heading]}</h2>
+        </Bot>
         {found.length > 0 && (
-          <button
-            type="button"
-            className={primary}
-            disabled={busy}
-            onClick={() => askNext({ ...answers, ...Object.fromEntries(found.map(([id, v]) => [id, String(v)])) })}
-          >
-            {ui.story_yes}
-          </button>
+          <ul className={`${card} flex flex-col divide-y divide-line !py-1`}>
+            {found.map(([id, value]) => {
+              const noted = spoken(id, String(value))
+              return (
+                <li key={id} className="py-2" data-understood={id}>
+                  <p className="text-muted">{noted.question}</p>
+                  <p className="font-semibold">{noted.answer}</p>
+                </li>
+              )
+            })}
+          </ul>
         )}
-        <button type="button" className={secondary} disabled={busy} onClick={() => go({ name: 'story' }, [ui.say_greeting])}>
-          {ui.story_again}
-        </button>
-        <button type="button" className={link} disabled={busy} onClick={() => askNext(answers)}>
-          {ui.story_skip}
-        </button>
-        {alert}
-      </div>
+        <div className="flex flex-wrap gap-2">
+          {back}
+          <button type="button" className={chip} disabled={busy} onClick={() => askNext(answers)}>
+            {ui.story_skip}
+          </button>
+        </div>
+      </Chat>
     )
   }
 
   const question = questions.find((q) => q.id === stage.id)!
-  const visible = visibleQuestions(questions, { ...answers })
   const answer = (value: string) => {
     hush()
-    setNoted(null)
+    onLog([asked(question.id), { from: 'me', text: spoken(question.id, value).answer }])
     askNext({ ...answers, [question.id]: value })
   }
   return (
-    <div className="flex w-full flex-col gap-4">
-      {noted && (
-        <p className={`${card} text-base`} data-noted>
-          {ui.you_said}: “{noted.said}” — {ui.last_answer}: <strong>{spoken(noted.id, noted.value).answer}</strong>
-        </p>
-      )}
-      <Mic key={question.id} ui={ui} lang={lang} busy={busy} onSaid={(text) => hear(text, question.id)} />
-      {alert}
-      <Questions
-        key={`tap-${question.id}`}
-        ui={ui}
-        question={question}
-        position={visible.filter((q) => answers[q.id] !== undefined).length + 1}
-        total={0}
-        answer={answers[question.id]}
-        onAnswer={answer}
-        onBack={previousQuestion}
-      />
-      <button type="button" className={link} onClick={() => say([question.text], lang)}>
-        {ui.replay}
-      </button>
-    </div>
+    <Questions
+      key={`tap-${question.id}`}
+      ui={ui}
+      question={question}
+      position={0}
+      total={0}
+      answer={answers[question.id]}
+      onAnswer={answer}
+      onBack={previousQuestion}
+      onReplay={() => say([question.text], lang)}
+      log={log}
+      sub={asked(question.id).sub}
+      subLang={otherLang}
+      mic={mic(question.id, question.id)}
+    />
   )
 }

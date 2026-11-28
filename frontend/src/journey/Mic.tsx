@@ -1,18 +1,21 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import type { Content, Lang } from '../api'
 import { hush, record, transcribe } from '../voice'
-import { secondary } from './ui'
+import Icon from './icons'
+import { field } from './ui'
 
 type Props = {
   ui: Content['ui']
+  /** The screen text in the other language, shown beside the main button's words. */
+  otherUi: Content['ui']
   lang: Lang
   busy: boolean
-  /** What the person said or typed. */
-  onSaid: (text: string) => void
+  /** What the person said or typed. `spoken` is false for typing. */
+  onSaid: (text: string, spoken: boolean) => void
 }
 
 /** Tap to speak, tap to stop. Typing always works too. Give it a new key for each step. */
-export default function Mic({ ui, lang, busy, onSaid }: Props) {
+export default function Mic({ ui, otherUi, lang, busy, onSaid }: Props) {
   const [state, setState] = useState<'idle' | 'starting' | 'recording' | 'hearing'>('idle')
   const [problem, setProblem] = useState('')
   const [typed, setTyped] = useState('')
@@ -43,7 +46,7 @@ export default function Mic({ ui, lang, busy, onSaid }: Props) {
         try {
           const text = await transcribe(audio, lang)
           if (!alive.current) return
-          if (text) onSaid(text)
+          if (text) onSaid(text, true)
           else setProblem(ui.not_caught)
         } catch {
           if (alive.current) setProblem(ui.voice_down)
@@ -66,36 +69,36 @@ export default function Mic({ ui, lang, busy, onSaid }: Props) {
     event.preventDefault()
     if (!typed.trim()) return
     hush()
-    onSaid(typed.trim())
+    onSaid(typed.trim(), false)
     setTyped('')
   }
 
   const working = busy || state === 'hearing' || state === 'starting'
-  const label = state === 'recording' ? ui.mic_stop : working ? ui.thinking : ui.mic_start
+  const key = state === 'recording' ? 'mic_stop' : working ? 'thinking' : 'mic_start'
 
   return (
-    <div className="flex w-full flex-col items-center gap-3">
+    <div className="flex w-full flex-col gap-2">
+      <p role="status" className="text-center font-semibold text-danger empty:hidden">
+        {state === 'recording' ? ui.listening : ''}
+      </p>
+      {problem && (
+        <p role="alert" className="text-center text-danger">
+          {problem}
+        </p>
+      )}
       <button
         type="button"
         onClick={tap}
         disabled={working}
+        aria-label={ui[key]}
         aria-pressed={state === 'recording'}
-        className="flex size-40 flex-col items-center justify-center gap-2 rounded-full border-4 border-emerald-900 bg-emerald-800 p-4 text-white disabled:border-stone-400 disabled:bg-stone-300 disabled:text-stone-700 aria-pressed:animate-pulse aria-pressed:border-red-900 aria-pressed:bg-red-700"
+        className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border border-fill-edge bg-fill px-4 py-2 font-semibold text-on-fill shadow-soft hover:brightness-110 disabled:border-line disabled:bg-line disabled:text-muted aria-pressed:animate-pulse aria-pressed:border-red-700 aria-pressed:bg-red-700 aria-pressed:text-white"
       >
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="size-14 fill-none stroke-current stroke-2">
-          <rect x="9" y="3" width="6" height="11" rx="3" />
-          <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
-        </svg>
-        <span className="text-base font-semibold">{label}</span>
+        <Icon name={state === 'recording' ? 'stop' : 'mic'} />
+        <span>
+          {ui[key]} · {otherUi[key]}
+        </span>
       </button>
-      <p role="status" className="min-h-7 text-lg font-medium">
-        {state === 'recording' ? ui.listening : ''}
-      </p>
-      {problem && (
-        <p role="alert" className="text-lg text-red-800">
-          {problem}
-        </p>
-      )}
       <form onSubmit={send} className="flex w-full gap-2">
         <input
           aria-label={ui.type_instead}
@@ -103,10 +106,16 @@ export default function Mic({ ui, lang, busy, onSaid }: Props) {
           value={typed}
           maxLength={1000}
           onChange={(event) => setTyped(event.target.value)}
-          className="min-h-14 min-w-0 flex-1 rounded-xl border-2 border-stone-400 bg-white px-3 text-lg"
+          className={`${field} min-w-0 flex-1`}
         />
-        <button type="submit" className={`${secondary} w-auto`} disabled={!typed.trim() || working || state === 'recording'}>
-          {ui.send}
+        <button
+          type="submit"
+          aria-label={ui.send}
+          title={ui.send}
+          disabled={!typed.trim() || working || state === 'recording'}
+          className="grid size-12 shrink-0 place-items-center rounded-2xl border border-edge bg-surface text-brand disabled:opacity-50"
+        >
+          <Icon name="send" />
         </button>
       </form>
     </div>
