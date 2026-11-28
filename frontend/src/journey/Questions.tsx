@@ -34,9 +34,11 @@ export default function Questions({ ui, question, position, total, answer, onAns
       <button type="button" className={`${link} self-start`} onClick={onBack}>
         ← {ui.back}
       </button>
-      <p className="text-base text-stone-700">
-        {ui.question_of.replace('{n}', String(position)).replace('{total}', String(total))}
-      </p>
+      {total > 0 && (
+        <p className="text-base text-stone-700">
+          {ui.question_of.replace('{n}', String(position)).replace('{total}', String(total))}
+        </p>
+      )}
       <h2 id="question" className={title}>
         {question.text}
       </h2>

@@ -110,5 +110,8 @@ sources:
   quote: a household living below the poverty line becomes eligible for lump sum financial assistance in the unfortunate event
     of the death of its primary breadwinner, provided the deceased was between 18 and 59 years of age. The family receives
     Rs.20,000
-review: null
+review:
+  by: JS
+  'on': '2026-11-28'
+  checksum: bb20c26ecf6a788f54fff5276ad30fc404644fb143c570b31bbb9d96aeb0e8cb
 government_order_verified: false

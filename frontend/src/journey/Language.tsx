@@ -1,5 +1,5 @@
 import type { Content, Lang } from '../api'
-import { primary } from './ui'
+import { primary, secondary } from './ui'
 
 const LANGUAGES = [
   { code: 'ta', label: 'தமிழ்', ready: true },
@@ -8,9 +8,16 @@ const LANGUAGES = [
   { code: 'en', label: 'English', ready: true },
 ]
 
-type Props = { lang: Lang; content: Content | null; onLanguage: (lang: Lang) => void; onStart: () => void }
+type Props = {
+  lang: Lang
+  content: Content | null
+  voiceReady: boolean
+  onLanguage: (lang: Lang) => void
+  onStart: () => void
+  onTalk: () => void
+}
 
-export default function Language({ lang, content, onLanguage, onStart }: Props) {
+export default function Language({ lang, content, voiceReady, onLanguage, onStart, onTalk }: Props) {
   return (
     <div className="flex w-full flex-col items-center gap-6 text-center">
       <p className="text-lg">{content?.ui.tagline ?? 'Your Voice. Your Rights. Your Benefits.'}</p>
@@ -32,10 +39,15 @@ export default function Language({ lang, content, onLanguage, onStart }: Props) 
       {content && (
         <>
           <p className="text-lg">{content.ui.intro}</p>
-          <button type="button" className={primary} onClick={onStart}>
-            {content.ui.start}
+          {voiceReady && (
+            <button type="button" className={primary} onClick={onTalk}>
+              {content.ui.talk_button}
+            </button>
+          )}
+          <button type="button" className={voiceReady ? secondary : primary} onClick={onStart}>
+            {voiceReady ? content.ui.tap_button : content.ui.start}
           </button>
-          <p className="text-base text-stone-700">{content.ui.voice_not_ready}</p>
+          {!voiceReady && <p className="text-base text-stone-700">{content.ui.no_key_voice}</p>}
           <p className="text-base text-stone-700">{content.ui.memory_note}</p>
         </>
       )}

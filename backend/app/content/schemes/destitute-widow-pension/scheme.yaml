@@ -187,5 +187,8 @@ sources:
   quote: Destitute Widow Pension Scheme | 1000 | Destitute 18 years and above Should be widow (up to her son attaining the
     age of 18 years) Without any income or source of income owning fixed assets valuing less than Rs.50000/- who have no relative
     of 18 years of age and over of the following category son, son’s son and other related persons who normally live together
-review: null
+review:
+  by: JS
+  'on': '2026-11-28'
+  checksum: cecabb71b582c0d09befb173bf848b5176b705ebfe724cdf6235ddefe4b6e779
 government_order_verified: false

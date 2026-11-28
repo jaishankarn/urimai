@@ -139,5 +139,8 @@ sources:
   checked_on: '2026-11-28'
   local_file: official/e-sevai-service-list-6f5ff859.md
   quote: Claim Application-Manual Board-Funeral Expenses / Natural Death | Operator | - | 0 | 60
-review: null
+review:
+  by: JS
+  'on': '2026-11-28'
+  checksum: 4e5e94ac1a62e1f86064722e250d825dbdb4e20d320095c74191987269166bc1
 government_order_verified: false

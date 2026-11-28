@@ -133,5 +133,8 @@ sources:
   checked_on: '2026-11-28'
   local_file: official/india-post-pmsby-5d6d9b00.md
   quote: All savings bank account holders in the age 18 to 70 years in participating banks will be entitled to join.
-review: null
+review:
+  by: JS
+  'on': '2026-11-28'
+  checksum: d47cc61d6e8469bfedee5627865f4d03421f9095c2f3e624f71d322eca74f33b
 government_order_verified: false

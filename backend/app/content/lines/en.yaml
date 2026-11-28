@@ -52,6 +52,49 @@ ui:
   have_all: You said you have everything on this list.
   back_to_results: Back to results
   start_again: Start again
+  talk_button: Talk to Urimai
+  tap_button: Answer by tapping instead
+  consent: Your voice and typed replies are sent to Sarvam, a speech and AI service, to turn them into text and details. Do
+    not say Aadhaar, OTP or bank account numbers.
+  talk_start: I agree. Start talking
+  say_greeting: Hello. I am Urimai. How can I help you? Tell me about your situation.
+  mic_start: Tap to speak
+  mic_stop: Tap when you finish
+  listening: Listening…
+  thinking: Understanding…
+  type_instead: Or type here
+  send: Send
+  replay: Hear it again
+  you_said: You said
+  understood: What I understood
+  understood_none: I did not catch any details. Say it again, or answer the questions one by one.
+  say_story_confirm: Please check what I understood. Is it right?
+  story_yes: Yes, this is right
+  story_again: Say it again
+  story_skip: Answer the questions instead
+  not_caught: Sorry, I did not understand. Please say it again, or tap an answer.
+  last_answer: Noted
+  mic_blocked: The microphone is not available. Type or tap instead.
+  voice_down: Voice is not available right now. Type or tap instead.
+  no_key_voice: Voice needs a Sarvam key, which is not set. You can tap your answers.
+  say_confirm: I have what I need. Please check your answers.
+  suggestions_title: Top suggestions
+  see_all: See all results and sources
+  say_intro: Here is what may apply to you. This is not a guarantee. Government officials decide.
+  say_intro_none: I cannot yet say that any benefit may apply. These need more information.
+  say_nothing: From your answers, none of the benefits I know about appears to apply. An office can tell you about others.
+  group_widow_pensions: Widow pension
+  group_widow_both_note: There is a state and a national widow pension. We have not confirmed whether you can receive both.
+    Do not add the amounts.
+  say_item: 'Suggestion {n}: {name}.'
+  say_amount: 'It could give: {amount}.'
+  say_why: 'It may apply because: {reasons}.'
+  say_check: 'Still to be checked: {check}'
+  say_deadline_tip: For benefits paid after a death, ask the office soon. We could not confirm the last date to claim.
+  say_more: '{count} more may also apply. They are shown on the screen.'
+  say_end: The screen shows what to check, the documents and the sources.
+  say_checks_remain: 'Officials still need to check some things. They are on the screen.'
+  hear_details: 'Hear why, and what to check'
 questions:
 - id: lives_in_tn
   type: choice
