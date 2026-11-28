@@ -15,7 +15,8 @@ def test_health_reports_key_without_leaking_it(monkeypatch, tmp_path, value, con
         monkeypatch.setenv("SARVAM_API_KEY", value)
     response = TestClient(create_app(tmp_path / "missing")).get("/api/health")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "sarvam_configured": configured}
+    assert response.json() == {"status": "ok", "sarvam_configured": configured, "database": False,
+                               "semantic_search": False, "data_version": None}
     assert "test-secret-123" not in response.text
 
 
