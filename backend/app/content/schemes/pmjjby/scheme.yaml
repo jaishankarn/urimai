@@ -12,10 +12,21 @@ aliases:
 - jeevan jyoti
 - bank life insurance
 conditions:
+- id: husband_died
+  text:
+    en: Your husband has passed away
+    ta: உங்கள் கணவர் காலமானார்
+  kind: checkable
+  any_of:
+  - - fact: widowed
+      op: eq
+      value: 'yes'
+      unknown_values: []
+  source: pmjjby
 - id: enrolled
   text:
-    en: A yearly life insurance deduction (₹436) was taken from his account
-    ta: அவர் கணக்கிலிருந்து ஆண்டு ஆயுள் காப்பீட்டுத் தொகை (₹436) பிடிக்கப்பட்டது
+    en: A yearly life insurance deduction (₹436; ₹330 in earlier years) was taken from his account
+    ta: அவர் கணக்கிலிருந்து ஆண்டு ஆயுள் காப்பீட்டுத் தொகை (₹436; ₹330 முந்தைய ஆண்டுகளில்) பிடிக்கப்பட்டது
   kind: checkable
   any_of:
   - - fact: insurance_deduction
@@ -23,6 +34,8 @@ conditions:
       value:
       - life
       - both
+      unknown_values:
+      - none
   source: pmjjby
 - id: husband_age_min
   text:
@@ -64,6 +77,11 @@ checks:
   text:
     en: Ask whether a waiting period applies after joining.
     ta: சேர்ந்த பிறகு காத்திருப்புக் காலம் பொருந்துமா என்று கேளுங்கள்.
+  source: null
+- id: ask_bank_enrolment
+  text:
+    en: If you did not see a deduction, still ask the bank. Older amounts were different.
+    ta: பிடித்தம் தெரியாவிட்டாலும் வங்கியில் கேளுங்கள். பழைய தொகைகள் வேறுபட்டவை.
   source: null
 conflicts: []
 amounts:

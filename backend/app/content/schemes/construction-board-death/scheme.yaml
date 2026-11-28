@@ -12,6 +12,17 @@ aliases:
 - construction welfare board
 - kattumana nalavariyam
 conditions:
+- id: husband_died
+  text:
+    en: Your husband has passed away
+    ta: உங்கள் கணவர் காலமானார்
+  kind: checkable
+  any_of:
+  - - fact: widowed
+      op: eq
+      value: 'yes'
+      unknown_values: []
+  source: labour
 - id: lives_in_tn
   text:
     en: You live in Tamil Nadu

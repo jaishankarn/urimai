@@ -12,6 +12,17 @@ aliases:
 - suraksha bima
 - bank accident insurance
 conditions:
+- id: husband_died
+  text:
+    en: Your husband has passed away
+    ta: உங்கள் கணவர் காலமானார்
+  kind: checkable
+  any_of:
+  - - fact: widowed
+      op: eq
+      value: 'yes'
+      unknown_values: []
+  source: pmsby_post
 - id: accident
   text:
     en: He died in an accident
@@ -24,8 +35,8 @@ conditions:
   source: pmsby_post
 - id: enrolled
   text:
-    en: A yearly accident insurance deduction (₹20) was taken from his account
-    ta: அவர் கணக்கிலிருந்து ஆண்டு விபத்துக் காப்பீட்டுத் தொகை (₹20) பிடிக்கப்பட்டது
+    en: A yearly accident insurance deduction (₹20; ₹12 in earlier years) was taken from his account
+    ta: அவர் கணக்கிலிருந்து ஆண்டு விபத்துக் காப்பீட்டுத் தொகை (₹20; ₹12 முந்தைய ஆண்டுகளில்) பிடிக்கப்பட்டது
   kind: checkable
   any_of:
   - - fact: insurance_deduction
@@ -33,6 +44,8 @@ conditions:
       value:
       - accident
       - both
+      unknown_values:
+      - none
   source: pmsby_post
 - id: husband_age_min
   text:
@@ -69,6 +82,11 @@ checks:
   text:
     en: Ask the bank who the nominee is.
     ta: நியமனதாரர் யார் என்று வங்கியில் கேளுங்கள்.
+  source: null
+- id: ask_bank_enrolment
+  text:
+    en: If you did not see a deduction, still ask the bank. Older amounts were different.
+    ta: பிடித்தம் தெரியாவிட்டாலும் வங்கியில் கேளுங்கள். பழைய தொகைகள் வேறுபட்டவை.
   source: null
 conflicts: []
 amounts:

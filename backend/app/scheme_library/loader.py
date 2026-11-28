@@ -5,7 +5,7 @@ import yaml
 from app.contracts.scheme import Scheme
 
 ORDER = ["destitute-widow-pension", "national-widow-pension", "national-family-benefit", "national-old-age-pension",
-         "construction-board-death", "manual-board-death", "pmjjby", "pmsby"]
+         "construction-board-death", "drivers-board-death", "manual-board-death", "pmjjby", "pmsby"]
 
 
 def load_schemes(content_dir: Path) -> list[Scheme]:

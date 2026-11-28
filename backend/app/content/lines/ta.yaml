@@ -301,6 +301,7 @@ questions:
   show_if:
     husband_work:
     - construction
+    - driver
     - other_manual
     - farm_labour
     - other
@@ -312,13 +313,13 @@ questions:
   text: அவரது வங்கிக் கணக்குப் புத்தகத்தில் ஆண்டுக் காப்பீட்டுத் தொகை பிடித்தம் இருந்ததா? கணக்கு எண்ணைச் சொல்ல வேண்டாம்.
   options:
   - value: life
-    label: ₹436 (ஆயுள் காப்பீடு)
+    label: ₹436, முந்தைய ஆண்டுகளில் ₹330 (ஆயுள் காப்பீடு)
   - value: accident
-    label: ₹20 (விபத்துக் காப்பீடு)
+    label: ₹20, முந்தைய ஆண்டுகளில் ₹12 (விபத்துக் காப்பீடு)
   - value: both
     label: இரண்டும்
   - value: none
-    label: 'பார்த்தேன்: இரண்டும் இல்லை'
+    label: 'பார்த்தேன்: இந்தத் தொகைகள் இல்லை'
   - value: unknown
     label: எனக்குத் தெரியாது
   show_if:

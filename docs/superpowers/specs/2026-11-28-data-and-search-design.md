@@ -63,7 +63,7 @@ Follows the folder structure in `docs/architecture.md`, as the team agreed: `bac
 
 ### Records
 
-One reviewed file per scheme in `backend/app/content/schemes/<slug>/scheme.yaml`. Seven benefits in eight files, because bank insurance is two schemes:
+One reviewed file per scheme in `backend/app/content/schemes/<slug>/scheme.yaml`. Eight benefits in nine files, because bank insurance is two schemes. The drivers' board was added after the code review, so that a driver's family is not told only that other boards do not apply:
 
 1. Destitute Widow Pension
 2. National widow pension (IGNWPS)
@@ -71,7 +71,8 @@ One reviewed file per scheme in `backend/app/content/schemes/<slug>/scheme.yaml`
 4. National old age pension (IGNOAPS)
 5. Construction workers' board death assistance
 6. Manual workers' board death assistance
-7. Bank insurance: PMJJBY and PMSBY
+7. Drivers' and automobile workshop workers' board death assistance
+8. Bank insurance: PMJJBY and PMSBY
 
 Each record holds: id; English and Tamil names; `aliases` including Tamil typed in English letters; benefit amount, frequency and wording; `conditions` (fact, comparison, value, `kind`, source id, exact quote); `documents`; `apply` (where, e-Sevai code, charge); `sources` (link, title, type, source date, date checked); `conflicts`; `reviewed_by` and `reviewed_on`; and `government_order_verified` (false for all today).
 
@@ -102,7 +103,7 @@ A benefit enters only with a source whose text we have read. Where a document li
 
 ### Review
 
-I draft each rule with its exact quote and link. The teammate compares them and records initials, date and a checksum of the rule. If conditions, amounts or checks change afterwards, the checksum no longer matches and the rule counts as unreviewed. An unreviewed rule's result shows no per-condition verdicts; its pending checks and conflicts are still shown. A review means "matches the quoted source", not "verified against a government order".
+I draft each rule with its exact quote and link. The teammate compares them and records initials, date and a checksum of the rule. If conditions, amounts or checks change afterwards, the checksum no longer matches and the rule counts as unreviewed. An unreviewed rule's result shows no per-condition verdicts, amounts, application route or documents; its name, pending checks, conflicts and sources are still shown. Every benefit that follows a death requires that the husband has passed away. Seeing no insurance deduction counts as unknown, because earlier premiums differed. A review means "matches the quoted source", not "verified against a government order".
 
 ### API
 
@@ -141,6 +142,7 @@ Made-up facts, also used as the main eligibility test (with reviewed rules):
 | PMJJBY life insurance | Needs more information: was he enrolled and covered? |
 | National old age pension | Appears ineligible: under 60 |
 | Manual workers' board | Appears ineligible: he was a construction worker |
+| Drivers' board | Appears ineligible: he was a construction worker |
 | PMSBY accident insurance | Appears ineligible: natural death |
 
 If a rule source turns out to say something different, the source wins and this table changes.

@@ -1,0 +1,142 @@
+# Reviewer: compare conditions, amounts and checks with each source's quote and link.
+# When satisfied, set review to {by: your initials, on: date, checksum: output of
+#   cd backend && .venv/bin/python -m scripts.review_checksum drivers-board-death }
+# Any later change to conditions, checks or amounts makes the rule unreviewed again.
+id: drivers-board-death
+name:
+  en: Drivers' and Automobile Workshop Workers' Welfare Board death assistance
+  ta: ஓட்டுநர் மற்றும் வாகனப் பழுதுபார்ப்புத் தொழிலாளர் நலவாரிய இறப்பு உதவித்தொகை
+aliases:
+- ஓட்டுநர் நலவாரியம்
+- ஓட்டுநர் இறப்பு உதவி
+- drivers welfare board
+- ottunar nalavariyam
+conditions:
+- id: husband_died
+  text:
+    en: Your husband has passed away
+    ta: உங்கள் கணவர் காலமானார்
+  kind: checkable
+  any_of:
+  - - fact: widowed
+      op: eq
+      value: 'yes'
+      unknown_values: []
+  source: labour
+- id: lives_in_tn
+  text:
+    en: You live in Tamil Nadu
+    ta: நீங்கள் தமிழ்நாட்டில் வசிக்கிறீர்கள்
+  kind: checkable
+  any_of:
+  - - fact: lives_in_tn
+      op: eq
+      value: 'yes'
+  source: labour
+- id: driver_work
+  text:
+    en: He was a driver or vehicle workshop worker
+    ta: அவர் ஓட்டுநர் அல்லது வாகனப் பழுதுபார்ப்புத் தொழிலாளி
+  kind: checkable
+  any_of:
+  - - fact: husband_work
+      op: eq
+      value: driver
+      unknown_values:
+      - other
+  source: labour
+- id: registered
+  text:
+    en: He was registered with the board
+    ta: அவர் நலவாரியத்தில் பதிவு செய்திருந்தார்
+  kind: checkable
+  any_of:
+  - - fact: husband_board_registered
+      op: eq
+      value: 'yes'
+  source: labour
+checks:
+- id: registration_valid
+  text:
+    en: Was his registration still valid when he died? We did not find the renewal rules.
+    ta: அவர் இறந்தபோது நலவாரியப் பதிவு செல்லுபடியாக இருந்ததா? புதுப்பித்தல் விதிகள் எங்களுக்குக் கிடைக்கவில்லை.
+  source: null
+- id: deadline
+  text:
+    en: We could not confirm the claim deadline. Ask now, because there may be one.
+    ta: கோரிக்கை அளிக்கக் கடைசி நாளை உறுதிப்படுத்த முடியவில்லை. கால வரம்பு இருக்கலாம், உடனே கேளுங்கள்.
+  source: null
+- id: documents
+  text:
+    en: Ask which documents the claim needs.
+    ta: கோரிக்கைக்குத் தேவையான ஆவணங்களைக் கேளுங்கள்.
+  source: null
+- id: nominee
+  text:
+    en: Ask who the registered nominee is.
+    ta: பதிவு செய்யப்பட்ட நியமனதாரர் யார் என்று கேளுங்கள்.
+  source: null
+conflicts: []
+amounts:
+- text:
+    en: ₹50,000 for a natural death
+    ta: இயற்கை மரணத்திற்கு ₹50,000
+  source: labour_natural
+  when:
+  - fact: death_cause
+    op: eq
+    value: natural
+- text:
+    en: ₹2,00,000 for an accidental death
+    ta: விபத்து மரணத்திற்கு ₹2,00,000
+  source: labour
+  when:
+  - fact: death_cause
+    op: eq
+    value: accident
+- text:
+    en: ₹5,000 funeral assistance
+    ta: ஈமச்சடங்கு உதவி ₹5,000
+  source: labour_natural
+  when: []
+documents:
+  confirmed: false
+  note:
+    en: Not confirmed. Ask the office.
+    ta: உறுதிப்படுத்தப்படவில்லை. அலுவலகத்தில் கேளுங்கள்.
+  items: []
+apply:
+  text:
+    en: e-Sevai lists drivers' board claim services. Ask which one fits.
+    ta: இ-சேவையில் ஓட்டுநர் நலவாரியக் கோரிக்கைச் சேவைகள் உள்ளன. எது பொருந்தும் என்று கேளுங்கள்.
+  service_code: null
+  charge_rupees: 60
+  source: esevai
+sources:
+- id: labour
+  title: Labour Welfare and Skill Development policy note 2025-26
+  url: https://labour.tn.gov.in/pdf/policy_note_lwsd_e_pn_2025_26.pdf
+  type: state department publication
+  source_date: 2025-26
+  checked_on: '2026-11-28'
+  local_file: official/labour-and-skill-development-policy-note-2025-26-630e5dae.md
+  quote: Tamil Nadu Unorganised Drivers and Automobile Workers Welfare Board Amount (in Rs.) Tamil Nadu Manual Workers Social
+    Security and Welfare Board and 17 other Welfare Boards Amount (in Rs.)
+- id: labour_natural
+  title: 'Labour policy note 2025-26: death and funeral assistance'
+  url: https://labour.tn.gov.in/pdf/policy_note_lwsd_e_pn_2025_26.pdf
+  type: state department publication
+  source_date: 2025-26
+  checked_on: '2026-11-28'
+  local_file: official/labour-and-skill-development-policy-note-2025-26-630e5dae.md
+  quote: 2. Natural Death Assistance 50,000 50,000 30,000 3. Funeral Expenses Assistance 5,000 5,000 5,000
+- id: esevai
+  title: e-Sevai service list
+  url: https://www.tnesevai.tn.gov.in/Pages/ServiceList.aspx
+  type: e-Sevai service list
+  source_date: null
+  checked_on: '2026-11-28'
+  local_file: official/e-sevai-service-list-6f5ff859.md
+  quote: Claim Application-Driver Board-Funeral Expenses / Natural Death | Operator | - | 0 | 60
+review: null
+government_order_verified: false

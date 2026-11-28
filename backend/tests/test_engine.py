@@ -10,6 +10,7 @@ EXPECTED = {
     "national-family-benefit": "potentially_eligible", "construction-board-death": "potentially_eligible",
     "pmjjby": "needs_more_information", "national-old-age-pension": "appears_ineligible",
     "manual-board-death": "appears_ineligible", "pmsby": "appears_ineligible",
+    "drivers-board-death": "appears_ineligible",
 }
 
 
@@ -66,7 +67,8 @@ def test_unknown_is_never_no(schemes, value):
     ("husband_work", "farm_labour", "manual-board-death", "needs_more_information"),
     ("husband_work", "other_manual", "manual-board-death", "potentially_eligible"),
     ("insurance_deduction", "life", "pmjjby", "potentially_eligible"),
-    ("insurance_deduction", "none", "pmjjby", "appears_ineligible"),
+    ("insurance_deduction", "none", "pmjjby", "needs_more_information"),  # older premiums differ
+    ("insurance_deduction", "accident", "pmjjby", "appears_ineligible"),
     ("lives_in_tn", "no", "destitute-widow-pension", "appears_ineligible"),
 ])
 def test_edges(schemes, field, value, scheme, expected):
@@ -107,3 +109,27 @@ def test_destitute_is_a_check_not_a_condition(schemes):
     found = results(reviewed(schemes))["destitute-widow-pension"]
     assert any("destitute" in c.text.en.lower() for c in found.checks) and found.conflicts
     assert not any("destitute" in c.text.en.lower() for c in found.conditions)
+
+
+def test_no_benefit_for_a_death_when_the_husband_is_alive(schemes):
+    found = results(reviewed(schemes), widowed="no", husband_age_at_death=None, husband_work=None, death_cause=None,
+                    husband_main_earner=None, husband_board_registered=None, insurance_deduction=None)
+    shown = {k for k, r in found.items() if r.outcome != "appears_ineligible"}
+    assert shown == set()
+
+
+def test_not_knowing_about_widowhood_asks_for_more(schemes):
+    assert outcomes(reviewed(schemes), widowed="unknown")["national-family-benefit"] == "needs_more_information"
+
+
+def test_unreviewed_result_gives_no_amount_application_or_documents(schemes):
+    for r in evaluate([s.model_copy(update={"review": None}) for s in schemes], Facts(**DEMO_FACTS)):
+        assert r.amounts == [], r.scheme_id
+        assert r.apply.service_code is None and r.apply.charge_rupees is None and r.documents.items == [] and not r.documents.confirmed
+
+
+def test_driver_is_pointed_to_the_drivers_board(schemes):
+    found = results(reviewed(schemes), husband_work="driver")
+    assert found["drivers-board-death"].outcome == "potentially_eligible"
+    assert "50,000" in found["drivers-board-death"].amounts[0].en
+    assert found["manual-board-death"].outcome == found["construction-board-death"].outcome == "appears_ineligible"

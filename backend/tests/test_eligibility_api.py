@@ -11,7 +11,7 @@ def test_returns_all_rules(tmp_path, demo):
     response = client(tmp_path).post("/api/eligibility", json=demo)
     assert response.status_code == 200
     found = response.json()["results"]
-    assert len(found) == 8
+    assert len(found) == 9
     assert all("local_file" not in source for r in found for source in r["sources"])
 
 

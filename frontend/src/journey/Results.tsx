@@ -11,6 +11,8 @@ type CardProps = { ui: Content['ui']; lang: Lang; result: Result; district: stri
 
 function Card({ ui, lang, result, district, onDocuments }: CardProps) {
   const ineligible = result.outcome === 'appears_ineligible'
+  // Amounts, how to apply and documents appear only for a reviewed rule that has not been ruled out.
+  const actionable = result.reviewed && !ineligible
   const group = GROUPS.find((g) => g.outcome === result.outcome)!
   const heading = 'mt-3 text-lg font-bold'
 
@@ -68,7 +70,7 @@ function Card({ ui, lang, result, district, onDocuments }: CardProps) {
         </div>
       )}
 
-      {!ineligible && (
+      {actionable && (
         <>
           <h5 className={heading}>{ui.apply}</h5>
           <p className="text-lg">{result.apply.text[lang]}</p>
@@ -107,7 +109,7 @@ function Card({ ui, lang, result, district, onDocuments }: CardProps) {
         </ul>
       </details>
 
-      {!ineligible && (
+      {actionable && (
         <button type="button" className={`${secondary} mt-3`} onClick={onDocuments}>
           {ui.documents_button}
         </button>

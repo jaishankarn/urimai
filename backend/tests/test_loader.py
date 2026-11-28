@@ -8,14 +8,14 @@ from app.contracts.scheme import Scheme
 
 KNOWLEDGE = Path(__file__).resolve().parents[2] / "data" / "knowledge"
 ORDER = ["destitute-widow-pension", "national-widow-pension", "national-family-benefit", "national-old-age-pension",
-         "construction-board-death", "manual-board-death", "pmjjby", "pmsby"]
+         "construction-board-death", "drivers-board-death", "manual-board-death", "pmjjby", "pmsby"]
 
 
 def squash(text):
     return re.sub(r"\s+", " ", text).strip()
 
 
-def test_loads_eight_rules_in_order(schemes):
+def test_loads_all_rules_in_order(schemes):
     assert [s.id for s in schemes] == ORDER
 
 

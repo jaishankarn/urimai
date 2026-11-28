@@ -57,3 +57,8 @@ def test_show_if_refers_to_earlier_answers(content):
 
 def test_unsupported_language_is_404(tmp_path):
     assert TestClient(create_app(tmp_path / "missing")).get("/api/content/hi").status_code == 404
+
+
+def test_driver_is_asked_about_board_registration(content):
+    question = next(q for q in content["en"]["questions"] if q["id"] == "husband_board_registered")
+    assert "driver" in question["show_if"]["husband_work"]

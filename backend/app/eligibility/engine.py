@@ -1,7 +1,9 @@
 """Plain rules, no AI. Three-valued: met, not met, or unknown."""
 from app.contracts.facts import Facts
 from app.contracts.result import ConditionResult, Result
-from app.contracts.scheme import Clause, PublicSource, Scheme
+from app.contracts.scheme import Apply, Clause, Documents, PublicSource, Scheme, Text
+
+NOT_CONFIRMED = Text(en="Not confirmed. Ask the office.", ta="உறுதிப்படுத்தப்படவில்லை. அலுவலகத்தில் கேளுங்கள்.")
 
 
 def _clause(clause: Clause, facts: Facts) -> str:
@@ -46,9 +48,12 @@ def _evaluate_one(scheme: Scheme, facts: Facts) -> Result:
 
     return Result(
         scheme_id=scheme.id, name=scheme.name, outcome=outcome, reviewed=scheme.reviewed,
-        amounts=[a.text for a in scheme.amounts if _all([_clause(w, facts) for w in a.when]) != "not_met"],
+        # An unreviewed rule names the scheme and its open questions only: an amount, a way to apply or a
+        # document list would read as a checked match.
+        amounts=[a.text for a in scheme.amounts if _all([_clause(w, facts) for w in a.when]) != "not_met"] if scheme.reviewed else [],
         conditions=conditions, checks=scheme.checks, conflicts=scheme.conflicts,
-        documents=scheme.documents, apply=scheme.apply,
+        documents=scheme.documents if scheme.reviewed else Documents(confirmed=False, note=NOT_CONFIRMED),
+        apply=scheme.apply if scheme.reviewed else Apply(text=NOT_CONFIRMED),
         sources=[PublicSource(**s.model_dump(exclude={"local_file"})) for s in scheme.sources])
 
 

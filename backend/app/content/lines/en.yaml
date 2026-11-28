@@ -301,6 +301,7 @@ questions:
   show_if:
     husband_work:
     - construction
+    - driver
     - other_manual
     - farm_labour
     - other
@@ -312,13 +313,13 @@ questions:
   text: In his bank passbook, did you see a yearly insurance deduction? Do not tell us the account number.
   options:
   - value: life
-    label: ₹436 (life insurance)
+    label: ₹436, or ₹330 in earlier years (life insurance)
   - value: accident
-    label: ₹20 (accident insurance)
+    label: ₹20, or ₹12 in earlier years (accident insurance)
   - value: both
     label: Both
   - value: none
-    label: 'I checked: neither'
+    label: I checked and did not see these amounts
   - value: unknown
     label: I don't know
   show_if:
