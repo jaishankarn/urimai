@@ -7,3 +7,5 @@ docs
 **/__pycache__
 **/.venv
 **/.pytest_cache
+data/raw
+data/knowledge
