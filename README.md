@@ -3,7 +3,12 @@ URIMAI - Your Voice. Your Rights. Your Benefits.
 
 A multilingual, voice-first companion that helps people in India find government benefits and apply for them.
 
-This is an early starter: the main screen runs, but voice and benefit discovery are not built yet.
+This is a prototype for one journey: a widow asking what help she may get, in Tamil or English.
+
+- **With a Sarvam key:** she tells her story by voice, Urimai shows what it understood, asks only the follow-up questions that can change a result, and speaks up to three suggestions.
+- **Without a key:** the same questions are answered by tapping.
+
+Eligibility is decided by rules a person has reviewed (`backend/app/content/schemes/`), never by AI. The AI only suggests details from what she says, which she confirms. Nothing here guarantees eligibility or approval. The rules are not checked against government orders. Tamil wording needs a native check. Search, form filling and saved progress are not part of this version.
 
 ## Run with Docker
 
@@ -15,7 +20,7 @@ Then open http://localhost:3000. No `.env` file or API key is needed.
 
 ### Optional key
 
-To set a Sarvam key, copy `.env.example` to `.env` and replace the placeholder. Never commit `.env`. Without a key, the app shows "Sarvam key not set".
+To use voice, copy `.env.example` to `.env` and replace the placeholder with a Sarvam key. Never commit `.env`. With a key, voice recordings and typed replies are sent to Sarvam. Without a key, the app shows "Sarvam key not set". The microphone works on `localhost` or over HTTPS.
 
 ## Local development
 

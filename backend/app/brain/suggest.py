@@ -26,6 +26,7 @@ class Suggestion(BaseModel):
     reasons: list[str]
     check: str
     note: str | None = None
+    detail: str = ""  # spoken only when the person asks to hear more
 
 
 class Other(BaseModel):
@@ -46,9 +47,15 @@ def _one(key: str, found: list[Result], ui: dict[str, str], lang: str) -> Sugges
     amounts = [(f"{name(r)}: " if pair else "") + getattr(a, lang) for r in found for a in r.amounts]
     reasons = list(dict.fromkeys(getattr(c.text, lang) for r in found for c in r.conditions
                                  if c.status == "met" and c.id != "lives_in_tn"))
+    check = getattr(found[0].checks[0].text, lang) if found[0].checks else ""
+    detail = [title + "."]
+    if reasons:
+        detail.append(ui["say_why"].format(reasons="; ".join(reasons[:SPOKEN_REASONS])))
+    if check:
+        detail.append(ui["say_check"].format(check=check))
     return Suggestion(key=key, scheme_ids=[r.scheme_id for r in found], title=title, amounts=amounts, reasons=reasons,
-                      check=getattr(found[0].checks[0].text, lang) if found[0].checks else "",
-                      note=ui["group_widow_both_note"] if pair and key == "widow-pensions" else None)
+                      check=check, note=ui["group_widow_both_note"] if pair and key == "widow-pensions" else None,
+                      detail=" ".join(detail)[:1200])
 
 
 def suggest(results: list[Result], ui: dict[str, str], lang: str) -> Suggestions:
@@ -66,20 +73,18 @@ def suggest(results: list[Result], ui: dict[str, str], lang: str) -> Suggestions
         speech = [ui["say_intro_none"] + " " + ". ".join(pending) + "."] if pending else [ui["say_nothing"]]
         return Suggestions(suggestions=[], others=[], speech=speech + [ui["say_end"]])
 
+    # The summary stays short enough to listen to; reasons and checks are on screen and in each "detail".
     speech = [ui["say_intro"]]
     for number, item in enumerate(shown, 1):
-        parts = [ui["say_item"].format(n=number, name=item.title)]
+        # The two widow pensions are named in their amounts, so their long title is not repeated.
+        parts = [ui["say_item"].format(n=number, name=ui["group_widow_pensions"] if item.note else item.title)]
         if item.amounts:
             parts.append(ui["say_amount"].format(amount="; ".join(item.amounts)))
         if item.note:
             parts.append(item.note)
-        if item.reasons:
-            parts.append(ui["say_why"].format(reasons="; ".join(item.reasons[:SPOKEN_REASONS])))
-        if item.check:
-            parts.append(ui["say_check"].format(check=item.check))
         speech.append(" ".join(parts)[:1200])
-    if any(item.key in AFTER_A_DEATH for item in shown):
-        speech.append(ui["say_deadline_tip"])
     if others:
         speech.append(ui["say_more"].format(count=len(others)))
-    return Suggestions(suggestions=shown, others=others, speech=speech + [ui["say_end"]])
+    if any(item.key in AFTER_A_DEATH for item in shown):
+        speech.append(ui["say_deadline_tip"])
+    return Suggestions(suggestions=shown, others=others, speech=speech + [ui["say_checks_remain"]])

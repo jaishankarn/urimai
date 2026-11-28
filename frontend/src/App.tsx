@@ -6,11 +6,15 @@ import Documents from './journey/Documents'
 import Language from './journey/Language'
 import Questions from './journey/Questions'
 import Results from './journey/Results'
+import Talk from './journey/Talk'
+import Top from './journey/Top'
+import { getSuggestions, hush, say, type Suggestions } from './voice'
 
 const UNREACHABLE = 'Cannot reach the Urimai server'
 
 type Step =
   | { name: 'language' }
+  | { name: 'talk' }
   | { name: 'question'; id: string; editing: boolean }
   | { name: 'confirm' }
   | { name: 'results' }
@@ -19,14 +23,18 @@ type Step =
 /** Asks the backend what is configured and returns a notice to show, if any. */
 function useServerNotice() {
   const [notice, setNotice] = useState('')
+  const [voiceReady, setVoiceReady] = useState(false)
 
   useEffect(() => {
     getHealth()
-      .then((health) => setNotice(health.sarvam_configured ? '' : 'Sarvam key not set'))
+      .then((health) => {
+        setVoiceReady(health.sarvam_configured)
+        setNotice(health.sarvam_configured ? '' : 'Sarvam key not set')
+      })
       .catch(() => setNotice(UNREACHABLE))
   }, [])
 
-  return notice
+  return { notice, voiceReady }
 }
 
 export default function App() {
@@ -38,7 +46,10 @@ export default function App() {
   const [results, setResults] = useState<Result[]>([])
   const [busy, setBusy] = useState(false)
   const [checkFailed, setCheckFailed] = useState(false)
-  const notice = useServerNotice()
+  const { notice, voiceReady } = useServerNotice()
+  // True once the person chose to talk; results are then also summed up and spoken.
+  const [spokenJourney, setSpokenJourney] = useState(false)
+  const [top, setTop] = useState<Suggestions | null>(null)
 
   useEffect(() => {
     let current = true
@@ -81,8 +92,16 @@ export default function App() {
     setBusy(true)
     setCheckFailed(false)
     try {
-      setResults(await checkEligibility(toFacts(visible, answers)))
+      const facts = toFacts(visible, answers)
+      const [found, suggested] = await Promise.all([
+        checkEligibility(facts),
+        // The summary is extra: if it fails, the full results still show.
+        spokenJourney ? getSuggestions(facts, shownLang).catch(() => null) : null,
+      ])
+      setResults(found)
+      setTop(suggested)
       setStep({ name: 'results' })
+      if (suggested) say(suggested.speech, shownLang)
     } catch {
       setCheckFailed(true)
     } finally {
@@ -96,12 +115,36 @@ export default function App() {
         <Language
           lang={lang}
           content={content}
+          voiceReady={voiceReady}
           onLanguage={setLang}
-          onStart={() => setStep({ name: 'question', id: visible[0].id, editing: false })}
+          onStart={() => {
+            setSpokenJourney(false)
+            setStep({ name: 'question', id: visible[0].id, editing: false })
+          }}
+          onTalk={() => {
+            setSpokenJourney(true)
+            setAnswers({})
+            setStep({ name: 'talk' })
+          }}
         />
       )
     }
     const ui = content.ui
+    if (step.name === 'talk') {
+      return (
+        <Talk
+          content={content}
+          lang={shownLang}
+          answers={answers}
+          onAnswers={setAnswers}
+          onFinished={() => setStep({ name: 'confirm' })}
+          onLeave={() => {
+            hush()
+            setStep({ name: 'language' })
+          }}
+        />
+      )
+    }
     if (step.name === 'question') {
       const position = visible.findIndex((q) => q.id === step.id)
       const question = visible[position]
@@ -122,7 +165,8 @@ export default function App() {
       return (
         <Confirm
           ui={ui}
-          questions={visible}
+          // A spoken conversation skips questions that cannot change a result, so only answered ones are listed.
+          questions={visible.filter((q) => answers[q.id] !== undefined)}
           answers={answers}
           busy={busy}
           failed={checkFailed}
@@ -137,7 +181,7 @@ export default function App() {
       return <Documents ui={ui} lang={shownLang} result={result} onBack={() => setStep({ name: 'results' })} />
     }
     const district = visible.find((q) => q.id === 'district')
-    return (
+    const details = (
       <Results
         ui={ui}
         lang={shownLang}
@@ -150,11 +194,19 @@ export default function App() {
         onDocuments={(schemeId) => setStep({ name: 'documents', schemeId })}
         onBack={() => setStep({ name: 'confirm' })}
         onRestart={() => {
+          hush()
           setAnswers({})
           setResults([])
+          setTop(null)
           setStep({ name: 'language' })
         }}
       />
+    )
+    return (
+      <>
+        {top && <Top ui={ui} lang={shownLang} found={top} />}
+        {details}
+      </>
     )
   }
 

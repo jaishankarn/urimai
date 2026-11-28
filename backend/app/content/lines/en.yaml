@@ -93,6 +93,8 @@ ui:
   say_deadline_tip: For benefits paid after a death, ask the office soon. We could not confirm the last date to claim.
   say_more: '{count} more may also apply. They are shown on the screen.'
   say_end: The screen shows what to check, the documents and the sources.
+  say_checks_remain: 'Officials still need to check some things. They are on the screen.'
+  hear_details: 'Hear why, and what to check'
 questions:
 - id: lives_in_tn
   type: choice

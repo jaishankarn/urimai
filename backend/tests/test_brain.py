@@ -97,3 +97,20 @@ def test_routes(tmp_path):
     body = client.post("/api/conversation/suggest", json={"facts": DEMO_FACTS, "lang": "ta"}).json()
     assert len(body["suggestions"]) == 3 and body["speech"]
     assert client.post("/api/conversation/next", json={"facts": {"aadhaar": "1"}}).status_code == 422
+
+
+@pytest.mark.parametrize("lang", ["en", "ta"])
+def test_the_spoken_summary_is_short_and_says_checks_remain(schemes, lines, lang):
+    found = suggestions(schemes, lines, lang)
+    ui = lines[lang].ui
+    spoken = " ".join(found.speech)
+    assert ui["say_checks_remain"] in found.speech
+    assert len(spoken) <= 1100, len(spoken)
+    for item in found.suggestions:
+        assert all(amount.split(": ", 1)[-1] in spoken for amount in item.amounts)
+        assert item.check not in spoken  # kept for "hear details"
+
+
+def test_details_hold_the_reason_and_the_check(schemes, lines):
+    for item in suggestions(schemes, lines).suggestions:
+        assert item.check in item.detail and item.reasons[0] in item.detail and len(item.detail) <= 1200
