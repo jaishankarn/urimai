@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Practice Pension Portal{% endblock %} – Demo</title>
+<link rel="stylesheet" href="/portal/static/vendor/jquery-ui.min.css">
+<link rel="stylesheet" href="/portal/static/vendor/select2.min.css">
+<link rel="stylesheet" href="/portal/static/portal.css">
+<script src="/portal/static/vendor/jquery.min.js"></script>
+<script src="/portal/static/vendor/jquery-ui.min.js"></script>
+<script src="/portal/static/vendor/select2.min.js"></script>
+{# The one line a department adds to its form pages: #}
+<script src="/widget/v1/widget.js" data-site-key="urimai-practice" defer></script>
+</head>
+<body>
+<div class="demo-banner" role="note">DEMO – not a government site. Practice portal for the Urimai prototype. Do not enter real Aadhaar numbers.</div>
+<div class="header">
+  <div class="header-title">Practice Pension Portal</div>
+  <div class="header-sub">Social Security Pensions – Online Application (demo)</div>
+</div>
+<div class="container">
+{% block body %}{% endblock %}
+</div>
+<div class="footer">Practice portal built for the Urimai hackathon prototype. Not affiliated with any government department.</div>
+{% block scripts %}{% endblock %}
+</body>
+</html>

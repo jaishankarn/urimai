@@ -1,0 +1,90 @@
+# Voice form widget lines. English and Tamil must have the same keys and placeholders (tested).
+# Hand-written and reviewed like other content. {placeholders} are filled by the widget.
+launcher: Fill by voice
+title: Urimai form helper
+demo_badge: Practice portal – not a government site
+greet: "Hello. I am Urimai. I will help you fill this form, one question at a time. I fill only what you confirm. Login, Aadhaar, captcha, uploads and Submit are yours."
+greet_carried: "Hello. I am Urimai. I have the details you confirmed earlier. I will fill them one at a time and you confirm each. Login, Aadhaar, captcha, uploads and Submit are yours."
+voice_off: Voice is not set up. You can tap or type your answers.
+voice_ready: Tap the microphone and speak. Tap again when you finish.
+filled_check: "I filled {label} as {value}. Is this right?"
+spelled_check: "I filled {label} as {value}. That is spelt {spelled}. Is this right?"
+ask_value: "{ask}"
+ask_again: "Please tell me {label} again."
+got_value: "I heard {value}."
+not_understood: Sorry, I did not catch that. Please say it again, or tap an answer.
+silence: "Are you there? {ask}"
+checked_ok: "The form shows {label} as {value}. That matches what you told Urimai."
+check_mismatch: "The form shows {label} as {value}, but you told Urimai {expected}. Please check which is right. I have not changed anything."
+check_empty: "{label} is empty on the form. It may fill itself after an earlier answer."
+site_error: "The website says: {message}"
+not_found: "I cannot find {label} on this page. Please fill it yourself, then say done."
+gave_up: "Let us leave {label} for now. Please fill it yourself, then say done."
+not_in_list: "{value} is not in the list for {label}. The choices are: {options}."
+options_are: "The choices are: {options}."
+loading_list: Waiting for the list to load…
+your_part: "This part is yours."
+wait_done: Say done when you have finished.
+still_empty: "The highlighted box still looks empty. Please complete it, then say done."
+press_button: Please press the highlighted button yourself. I will wait.
+page_loaded: The page has changed. Let me check what is filled.
+page_errors: "The website found problems: {message}"
+redo_field: "{label} needs to be filled again."
+guidance_mode: "This page looks different from what I know, so I will not fill anything. I will guide you step by step instead."
+guidance_step: "Next, find {label} and fill it yourself. Say done when finished."
+skipped: "Skipped {label}."
+cannot_skip: "{label} is needed. Please give an answer."
+no_help: "Sorry, I have no more explanation for this question."
+back_to: "Going back to {label}."
+nothing_before: There is nothing before this question.
+stop_confirm: Stop filling? What is already filled stays on the page.
+stopped: I have stopped. Your answers on the page are not changed. Tap "Fill by voice" to start again.
+finished: "The application was sent by you. Thank you. Keep the reference number."
+reference: "Your reference number is {ref}."
+no_reference: I could not see a reference number. Please note down anything shown on this page.
+not_guaranteed: Sending the form does not guarantee approval. The department decides.
+expired: This link has expired or was already used. You can still fill the form by voice, but I will ask for every detail.
+offline: I cannot reach the Urimai server. Your progress is saved in this tab. Please try again when you are online.
+voice_failed: Voice is not working right now. Please tap or type.
+idle_paused: I paused because there was no reply for a while. Tap any answer to continue.
+listening: Listening… tap again to stop.
+thinking: One moment…
+progress: "Form {done} of {total}"
+tag_filled: filled
+tag_yours: your part
+tag_checked: checked
+"yes": "Yes"
+"no": "No"
+done: Done
+repeat: Repeat
+skip: Skip
+back: Back
+help: What is this?
+stop: Stop
+send: Send
+type_here: Type your answer
+mic: Speak
+mic_stop: Stop recording
+minimise: Minimise
+restore: Open helper
+dock: Move to other side
+mute: Mute voice
+unmute: Turn voice on
+language: தமிழ்
+choose_option: "Tap your choice:"
+start: Start
+choose_language: "Choose a language to begin."
+check_shown: "The form shows {label} as {value}."
+refilled: "I filled {label} again as {value}, as you confirmed before."
+is_form_right: Is the value on the form right?
+problem_bad_date: "I could not understand that date. Please say the day, month and year, for example 14 March 1968."
+problem_ambiguous: More than one choice matches. Please say the full name, or tap your choice.
+problem_not_in_list: "That is not one of the choices. {options}"
+problem_too_long: This box on the website does not take that many letters. Please say it shorter.
+problem_date_not_available: The calendar on this page does not allow that date. Please check the date, or pick it yourself.
+problem_not_understood: Sorry, I did not catch that. Please say it again, or tap an answer.
+session_expired: "This helper session has ended. Tap \"Fill by voice\" to start again. What is on the page stays."
+which_field: Which detail should we change? Tap it, or say its name.
+fix_myself: I will fix it myself
+extra_field: "Please fill {label} yourself. Say done when finished."
+this_box: the highlighted box

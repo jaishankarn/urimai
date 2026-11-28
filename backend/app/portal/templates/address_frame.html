@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><link rel="stylesheet" href="/portal/static/portal.css"></head>
+<body class="frame">
+<table class="form">
+  <tr><td class="lbl">Door No <span class="req">*</span></td><td><input type="text" id="DoorNo" maxlength="20" value="{{ v.get('DoorNo', '') }}"></td></tr>
+  <tr><td class="lbl">Street / Area <span class="req">*</span></td><td><input type="text" id="Street" maxlength="80" value="{{ v.get('Street', '') }}"></td></tr>
+  <tr><td class="lbl">Pin Code <span class="req">*</span></td><td><input type="text" id="Pincode" maxlength="6" inputmode="numeric" value="{{ v.get('Pincode', '') }}"><span class="err" id="PincodeErr"></span></td></tr>
+</table>
+<script>
+  document.getElementById('Pincode').addEventListener('blur', function () {
+    document.getElementById('PincodeErr').textContent = /^6[0-4]\d{4}$/.test(this.value) || !this.value ? '' : 'Enter a valid Tamil Nadu PIN code.';
+  });
+</script>
+</body>
+</html>

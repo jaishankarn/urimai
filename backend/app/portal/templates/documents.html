@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Destitute Widow Pension – Documents{% endblock %}
+{% macro err(name) %}{% if errors.get(name) %}<span class="err">{{ errors[name] }}</span>{% endif %}{% endmacro %}
+{% block body %}
+<h2>Destitute Widow Pension – Application (Step 2 of 2: Documents)</h2>
+{% if errors %}
+<div class="summary" role="alert">
+  <strong>Please correct the following:</strong>
+  <ul>{% for message in errors.values() %}<li>{{ message }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+<form id="form2" method="post" action="/portal/pension/documents" enctype="multipart/form-data">
+<table class="form">
+  <tr>
+    <td class="lbl">Applicant Photo (JPG/PNG, max 500 KB) <span class="req">*</span></td>
+    <td><input type="file" id="Photo" name="Photo" accept="image/jpeg,image/png"><span class="file-msg" id="PhotoMsg"></span>{{ err('Photo') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Husband's Death Certificate (PDF/JPG/PNG, max 1 MB) <span class="req">*</span></td>
+    <td><input type="file" id="DeathCertificate" name="DeathCertificate" accept="application/pdf,image/jpeg,image/png"><span class="file-msg" id="DeathCertificateMsg"></span>{{ err('DeathCertificate') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Declaration <span class="req">*</span></td>
+    <td><label><input type="checkbox" id="Declaration" name="Declaration"> I declare that the details given above are true. I have no other pension and my property is worth less than ₹1,00,000.</label>{{ err('Declaration') }}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Captcha <span class="req">*</span></td>
+    <td>
+      <img id="CaptchaImg" src="/portal/captcha.svg?r={{ range(1, 1000000) | random }}" alt="Captcha image" width="140" height="44">
+      <a href="#" id="CaptchaRefresh">Refresh</a><br>
+      <input type="text" id="CaptchaText" name="CaptchaText" maxlength="5" autocomplete="off" placeholder="Type the letters">{{ err('CaptchaText') }}
+    </td>
+  </tr>
+</table>
+<div class="actions">
+  <a class="btn btn-light" href="/portal/pension/apply">Back</a>
+  <button type="submit" id="btnSubmit" class="btn">Submit</button>
+</div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+  $('#CaptchaRefresh').on('click', function (e) { e.preventDefault(); $('#CaptchaImg').attr('src', '/portal/captcha.svg?r=' + Math.random()); });
+  $('input[type=file]').on('change', function () {
+    var f = this.files[0];
+    $('#' + this.id + 'Msg').text(f ? '✓ ' + f.name + ' (' + Math.max(1, Math.round(f.size / 1024)) + ' KB)' : '');
+  });
+</script>
+{% endblock %}
